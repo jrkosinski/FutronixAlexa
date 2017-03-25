@@ -1,6 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <WiFiUdp.h>
+#include <WebSocketsClient.h>
 #include "IRremoteESP8266.h"
 #include <functional>
 #include "UpnpBroadcastResponder.h"
@@ -11,9 +12,7 @@
 
 /*
  * try to connect to a service 
- * upload code to source control 
  * find out convention for pin 
- * add futronix send codes to the mix 
  */
 
 
