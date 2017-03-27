@@ -1,0 +1,12 @@
+
+Board: Generic ESP8266 Module
+Flash Mode: DIO
+Flash Frequency: 40MHz
+CPU Frequency: 80MHz
+Flash Size: 512K
+Debug Port: Serial
+Debug Level: Core
+Reset Method: nodemcu
+Upload Speed: 115200
+Port: COM<x>
+
