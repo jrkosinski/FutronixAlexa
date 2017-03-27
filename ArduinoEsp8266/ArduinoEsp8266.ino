@@ -1,34 +1,62 @@
+
+//ESP8266/Arduino base libs
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <WiFiUdp.h>
-#include <WebSocketsClient.h>
-#include "IRremoteESP8266.h"
-#include <functional>
+#include <Stream.h>
+
+//WEMO
 #include "UpnpBroadcastResponder.h"
 #include "UpnpBroadcastResponder.h"
 #include "CallbackFunction.h"
+
+//Futronix
 #include "FutronixLightController.h"
+
+//IR
+#include <IRremoteESP8266.h>
+
+//WEBSockets
+#include <WebSockets.h>
+#include <WebSocketsClient.h>
+#include <Hash.h>
+
+//AWS SDK
+#include <sha256.h>
+#include <Utils.h>
+#include <AWSClient2.h>
+
+//MQTT PAHO
+#include <SPI.h>
+#include <IPStack.h>
+#include <Countdown.h>
+#include <MQTTClient.h>
+
+//AWS MQTT Websocket
+#include <Client.h>
+#include <AWSWebSocketClient.h>
+#include <CircularByteBuffer.h>
 
 
 /*
- * try to connect to a service 
- * find out convention for pin 
- */
+   try to connect to a service
+   find out convention for pin
+*/
 
 
-//#define __BLANK_OUT_CODE__ 
+//#define __BLANK_OUT_CODE__
 //#define __BLINKERS_ONLY__
 
 
 #ifdef __BLANK_OUT_CODE__
-  void setup()
-  {
-  }
+void setup()
+{
+}
 
-  void loop()
-  {
-  }
-  
+void loop()
+{
+}
+
 #else
 
 //diagnostic blinkers
@@ -41,15 +69,15 @@ void ledOff();
 
 #ifdef __BLINKERS_ONLY__
 
-  void setup()
-  {
-    pinMode(_ledPin, OUTPUT);
-  }
+void setup()
+{
+  pinMode(_ledPin, OUTPUT);
+}
 
-  void loop()
-  {
-    blinkLed();
-  }
+void loop()
+{
+  blinkLed();
+}
 #else
 
 // prototypes
@@ -72,14 +100,14 @@ IRsend irsend(0); //an IR led is connected to GPIO pin 0
 FutronixLightController futronix;
 
 /*****************
- * setup
- */
+   setup
+*/
 void setup()
 {
   //pinMode(_ledPin, OUTPUT);
   //ledOff();
   irsend.begin();
-  
+
   Serial.begin(9600);
   // Initialise wifi connection
   wifiConnected = connectWifi();
@@ -88,7 +116,7 @@ void setup()
     upnpBroadcastResponder.beginUdpMulticast();
 
     // Define your switches here. Max 14
-    // Format: Alexa invocation name, local port no, on callback, off callback. 
+    // Format: Alexa invocation name, local port no, on callback, off callback.
     office = new WemoSwitch("office lights", 80, officeLightsOn, officeLightsOff);
 
     Serial.println("Adding switches upnp broadcast responder");
@@ -101,8 +129,8 @@ void setup()
 }
 
 /*****************
- * loop
- */
+   loop
+*/
 void loop()
 {
   if (wifiConnected) {
@@ -115,30 +143,30 @@ void loop()
     delay(2000);
   }
   else
-  {    
+  {
     //ledOff();
     Serial.print("Wifi not connected ...");
   }
 }
 
 /*****************
- * officeLightsOn
- */
+   officeLightsOn
+*/
 void officeLightsOn() {
   Serial.print("Switch 1 turn on ...");
 }
 
 /*****************
- * officeLightsOff
- */
+   officeLightsOff
+*/
 void officeLightsOff() {
   Serial.print("Switch 1 turn off ...");
 }
 
 /*****************
- * connectWifi
- * connect to wifi – returns true if successful or false if not
- */
+   connectWifi
+   connect to wifi – returns true if successful or false if not
+*/
 boolean connectWifi() {
   boolean state = true;
   int i = 0;
@@ -178,16 +206,16 @@ boolean connectWifi() {
 #endif
 
 /*****************
- * blinkLed
- */
+   blinkLed
+*/
 void blinkLed()
 {
   blinkLed(1);
 }
 
 /*****************
- * blinkLed
- */
+   blinkLed
+*/
 void blinkLed(unsigned int count)
 {
   for (int n = 0; n < count; n++)
@@ -200,19 +228,19 @@ void blinkLed(unsigned int count)
 }
 
 /*****************
- * ledOn
- */
+   ledOn
+*/
 void ledOn()
 {
-  digitalWrite(_ledPin, LOW);     
+  digitalWrite(_ledPin, LOW);
 }
 
 /*****************
- * ledOff
- */
+   ledOff
+*/
 void ledOff()
 {
-  digitalWrite(_ledPin, HIGH);      
+  digitalWrite(_ledPin, HIGH);
 }
 
 

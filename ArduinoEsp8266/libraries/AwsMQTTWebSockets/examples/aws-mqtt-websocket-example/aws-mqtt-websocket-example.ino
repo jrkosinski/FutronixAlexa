@@ -5,9 +5,9 @@
 #include <ESP8266WiFiMulti.h>
 
 //AWS
-#include "sha256.h"
-#include "Utils.h"
-#include "AWSClient2.h"
+#include <sha256.h>
+#include <Utils.h>
+#include <AWSClient2.h>
 
 //WEBSockets
 #include <Hash.h>
@@ -18,8 +18,6 @@
 #include <IPStack.h>
 #include <Countdown.h>
 #include <MQTTClient.h>
-
-
 
 //AWS MQTT Websocket
 #include "Client.h"
