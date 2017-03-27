@@ -88,7 +88,7 @@ void setup()
     upnpBroadcastResponder.beginUdpMulticast();
 
     // Define your switches here. Max 14
-    // Format: Alexa invocation name, local port no, on callback, off callback
+    // Format: Alexa invocation name, local port no, on callback, off callback. 
     office = new WemoSwitch("office lights", 80, officeLightsOn, officeLightsOff);
 
     Serial.println("Adding switches upnp broadcast responder");
