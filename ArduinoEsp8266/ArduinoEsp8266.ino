@@ -40,52 +40,61 @@
 #include <MQTTClient.h>
 
 //AWS MQTT Websocket
-#include <Client.h>
+#include <Client.h> 
 #include <AWSWebSocketClient.h>
 #include <CircularByteBuffer.h>
 
 
-//#define __BLANK_OUT_CODE__
 
 
-#ifndef __BLANK_OUT_CODE__
+#define __TEST_WEMO__
+//#define __TEST_IR__
+//#define __TEST_AWS__
 
-//diagnostic blinkers
-#define LED_PIN   2
+#define   LED_PIN   2
 
+
+
+// prototypes
 void blinkLed(unsigned int);
 void blinkLed();
 void ledOn();
 void ledOff();
 
-// prototypes
 boolean connectWifi();
 
-//AWS MQQT
-bool mqqtConnect();
+//AWS MQTT
+bool mqttConnect();
 char* generateClientID (); 
 void messageArrived(MQTT::MessageData&); 
-void mqqtSubscribe (); 
-void mqqtSendMessage ();
+void mqttSubscribe (); 
+void mqttSendMessage ();
 
 //on/off callbacks
 void officeLightsOn();
 void officeLightsOff();
 
 
+
+
 // Constants
 const char* wifi_ssid              = "mina";
 const char* wifi_password          = "HappyTime";
-char aws_endpoint[]           = "your-endpoint.iot.eu-west-1.amazonaws.com";
-char aws_key[]                = "your-iam-key";
-char aws_secret[]             = "your-iam-secret-key";
-char aws_region[]             = "eu-west-1";
-const char* aws_topic         = "$aws/things/your-device/shadow/update";
+
+char aws_endpoint[]           = "a21jd7gud1swyd.iot.us-east-1.amazonaws.com";
+char aws_key[]                = "AKIAIS7JT5B2C5SIKVQQ"; 
+char aws_secret[]             = "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";
+char aws_region[]             = "eu-east-1";
+const char* aws_topic         = "$aws/things/Sigma/shadow/update";
 const int port                = 443;
+
+
 
 //MQTT config
 const int maxMQTTpackageSize = 512;
 const int maxMQTTMessageHandlers = 1;
+
+int _irCount = 0; 
 
 //Globals 
 boolean wifiConnected = false;
@@ -94,13 +103,138 @@ WemoSwitch *office = NULL;
 IRsend irsend(0); //an IR led is connected to GPIO pin 0
 FutronixLightController futronix;
 
-//AWS MQQT
+
+
+//AWS MQTT
 ESP8266WiFiMulti wiFiMulti;
 AWSWebSocketClient awsWSclient(1000);
 IPStack ipstack(awsWSclient);
-MQTT::Client<IPStack, Countdown, maxMQTTpackageSize, maxMQTTMessageHandlers> *mqqtClient = NULL;
+MQTT::Client<IPStack, Countdown, maxMQTTpackageSize, maxMQTTMessageHandlers> *mqttClient = NULL;
 int arrivedcount = 0;
 long connection = 0;
+
+
+
+/*********************************************************************************************************************************************************/
+/*********************************************************************************************************************************************************/
+
+
+/*****************
+   setup
+*/
+void setup()
+{
+  Serial.begin(9600);
+  //Serial.setDebugOutput(1);
+  //Serial.begin (115200);
+  configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+
+  pinMode(LED_PIN, OUTPUT); 
+  ledOn();
+  
+  //IR 
+  #ifdef __TEST_IR__
+  Serial.println("testing IR"); 
+  //irsend.begin();
+  #endif 
+
+  
+  //WEMO 
+  #ifdef __TEST_WEMO__
+  Serial.println("testing WEMO"); 
+  // Initialise wifi connection
+  wifiConnected = connectWifi();
+
+  if (wifiConnected) {
+    upnpBroadcastResponder.beginUdpMulticast();
+
+    // Define your switches here. Max 14
+    // Format: Alexa invocation name, local port no, on callback, off callback.
+    office = new WemoSwitch("office lights", 80, officeLightsOn, officeLightsOff);
+
+    Serial.println("Adding switches upnp broadcast responder");
+    upnpBroadcastResponder.addDevice(*office);
+  }
+  #endif
+  
+
+  //MQTT
+  #ifdef __TEST_AWS__
+  Serial.println("testing AWS"); 
+    //fill with ssid and wifi password
+    wiFiMulti.addAP(wifi_ssid, wifi_password);
+    Serial.println ("connecting to wifi");
+    while(wiFiMulti.run() != WL_CONNECTED) {
+        delay(100);
+        Serial.print (".");
+    }
+    Serial.println ("\nconnected");
+
+    //fill AWS parameters    
+    awsWSclient.setAWSRegion(aws_region);
+    awsWSclient.setAWSDomain(aws_endpoint);
+    awsWSclient.setAWSKeyID(aws_key);
+    awsWSclient.setAWSSecretKey(aws_secret);
+    awsWSclient.setUseSSL(true);
+
+    if (mqttConnect ()){
+      blinkLed(3);
+      mqttSubscribe ();
+      mqttSendMessage ();
+    }
+  #endif
+}
+
+/*****************
+   loop
+*/
+void loop()
+{
+  //IR 
+  #ifdef __TEST_IR__
+
+  if (_irCount < 10)
+  {
+    futronix.setSceneInZone(0, 2, &irsend);
+    futronix.setSceneInZone(1, 2, &irsend);
+    futronix.setSceneInZone(2, 2, &irsend);
+    futronix.setSceneInZone(3, 2, &irsend);
+    futronix.setSceneInZone(4, 2, &irsend);
+    futronix.setSceneInZone(5, 2, &irsend);
+    futronix.setSceneInZone(6, 2, &irsend);
+    futronix.setSceneInZone(7, 2, &irsend);
+    futronix.setSceneInZone(8, 2, &irsend);
+    futronix.setSceneInZone(9, 2, &irsend);
+    futronix.setSceneInZone(10, 2, &irsend);
+    futronix.setSceneInZone(11, 2, &irsend);
+    futronix.setSceneInZone(12, 2, &irsend);
+    _irCount++; 
+    blinkLed();
+    delay(5000); 
+  }
+  #endif 
+
+
+  #ifdef __TEST_WEMO__
+  if (wifiConnected) {
+    //Wemo
+    upnpBroadcastResponder.serverLoop();
+
+    office->serverLoop();
+
+    //Futronix
+    //futronix.setSceneInZone(0, 12, &irsend);
+  }
+  else
+  {
+    //ledOff();
+    //Serial.println("Wifi not connected ...");
+  }
+  #endif
+}
+
+
+/*********************************************************************************************************************************************************/
 
 
 /*****************
@@ -140,20 +274,21 @@ void messageArrived(MQTT::MessageData& md)
 }
 
 /*****************
-   mqqtConnect
+   mqttConnect
    connects to websocket layer and mqtt layer
 */
-bool mqqtConnect () 
+bool mqttConnect () 
 {
-    if (mqqtClient == NULL) {
-      mqqtClient = new MQTT::Client<IPStack, Countdown, maxMQTTpackageSize, maxMQTTMessageHandlers>(ipstack);
+    if (mqttClient == NULL) {
+      mqttClient = new MQTT::Client<IPStack, Countdown, maxMQTTpackageSize, maxMQTTMessageHandlers>(ipstack);
     } else {
 
-      if (mqqtClient->isConnected ()) {    
-        mqqtClient->disconnect ();
+      if (mqttClient->isConnected ()) {    
+        Serial.println("Connected already; disconnecting..."); 
+        mqttClient->disconnect ();
       }  
-      delete mqqtClient;
-      mqqtClient = new MQTT::Client<IPStack, Countdown, maxMQTTpackageSize, maxMQTTMessageHandlers>(ipstack);
+      delete mqttClient;
+      mqttClient = new MQTT::Client<IPStack, Countdown, maxMQTTpackageSize, maxMQTTMessageHandlers>(ipstack);
     }
 
     //delay is not necessary... it just help us to get a "trustful" heap space value
@@ -170,6 +305,7 @@ bool mqqtConnect ()
     if (rc != 1)
     {
       Serial.println("error connection to the websocket server");
+      Serial.println(rc);
       return false;
     } else {
       Serial.println("websocket layer connected");
@@ -181,7 +317,7 @@ bool mqqtConnect ()
     data.MQTTVersion = 3;
     char* clientID = generateClientID ();
     data.clientID.cstring = clientID;
-    rc = mqqtClient->connect(data);
+    rc = mqttClient->connect(data);
     delete[] clientID;
     if (rc != 0)
     {
@@ -194,12 +330,12 @@ bool mqqtConnect ()
 }
 
 /*****************
-   mqqtSubscribe
+   mqttSubscribe
    subscribe to a mqtt topic
 */
-void mqqtSubscribe () {
+void mqttSubscribe () {
    //subscript to a topic
-    int rc = mqqtClient->subscribe(aws_topic, MQTT::QOS0, messageArrived);
+    int rc = mqttClient->subscribe(aws_topic, MQTT::QOS0, messageArrived);
     if (rc != 0) {
       Serial.print("rc from MQTT subscribe is ");
       Serial.println(rc);
@@ -209,10 +345,10 @@ void mqqtSubscribe () {
 }
 
 /*****************
-   mqqtSendMessage
+   mqttSendMessage
    send a message to a mqtt topic
 */
-void mqqtSendMessage () {
+void mqttSendMessage () {
     //send a message
     MQTT::Message message;
     char buf[100];
@@ -222,90 +358,7 @@ void mqqtSendMessage () {
     message.dup = false;
     message.payload = (void*)buf;
     message.payloadlen = strlen(buf)+1;
-    int rc = mqqtClient->publish(aws_topic, message); 
-}
-
-
-/*****************
-   setup
-*/
-void setup()
-{
-  Serial.begin(9600);
-
-  //IR 
-  irsend.begin();
-
-  //Wemo 
-  // Initialise wifi connection
-  wifiConnected = connectWifi();
-
-  if (wifiConnected) {
-    upnpBroadcastResponder.beginUdpMulticast();
-
-    // Define your switches here. Max 14
-    // Format: Alexa invocation name, local port no, on callback, off callback.
-    office = new WemoSwitch("office lights", 80, officeLightsOn, officeLightsOff);
-
-    Serial.println("Adding switches upnp broadcast responder");
-    upnpBroadcastResponder.addDevice(*office);
-  }
-
-  //MQQT
-    //fill with ssid and wifi password
-    wiFiMulti.addAP(wifi_ssid, wifi_password);
-    Serial.println ("connecting to wifi");
-    while(wiFiMulti.run() != WL_CONNECTED) {
-        delay(100);
-        Serial.print (".");
-    }
-    Serial.println ("\nconnected");
-
-    //fill AWS parameters    
-    awsWSclient.setAWSRegion(aws_region);
-    awsWSclient.setAWSDomain(aws_endpoint);
-    awsWSclient.setAWSKeyID(aws_key);
-    awsWSclient.setAWSSecretKey(aws_secret);
-    awsWSclient.setUseSSL(true);
-
-    if (mqqtConnect ()){
-      mqqtSubscribe ();
-      mqqtSendMessage ();
-    }
-}
-
-/*****************
-   loop
-*/
-void loop()
-{
-  if (wifiConnected) {
-    //Wemo
-    upnpBroadcastResponder.serverLoop();
-
-    office->serverLoop();
-
-    //Futronix
-    futronix.setSceneInZone(0, 12, &irsend);
-
-    //MQQT
-    //keep the mqtt up and running
-    if (awsWSclient.connected ()) {    
-        mqqtClient->yield();
-    } else {
-      //handle reconnection
-      if (mqqtConnect ()){
-        mqqtSubscribe ();      
-      }
-    }
-    
-    delay(2000);
-  }
-  else
-  {
-    //ledOff();
-    Serial.print("Wifi not connected ...");
-  }
+    int rc = mqttClient->publish(aws_topic, message); 
 }
 
 /*****************
@@ -313,6 +366,7 @@ void loop()
 */
 void officeLightsOn() {
   Serial.print("Switch 1 turn on ...");
+  ledOn();
 }
 
 /*****************
@@ -320,6 +374,7 @@ void officeLightsOn() {
 */
 void officeLightsOff() {
   Serial.print("Switch 1 turn off ...");
+  ledOff();
 }
 
 /*****************
@@ -401,16 +456,4 @@ void ledOff()
   digitalWrite(LED_PIN, HIGH);
 }
 
-
-#else
-
-void setup()
-{
-}
-
-void loop()
-{
-}
-
-#endif
 
