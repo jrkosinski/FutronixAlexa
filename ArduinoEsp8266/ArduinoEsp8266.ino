@@ -71,8 +71,22 @@ void mqttSubscribe ();
 void mqttSendMessage ();
 
 //on/off callbacks
-void officeLightsOn();
-void officeLightsOff();
+void sceneOn(int);
+void sceneOff(int); 
+void scene1On();
+void scene1Off();
+void scene2On();
+void scene2Off();
+void scene3On();
+void scene3Off();
+void scene4On();
+void scene4Off();
+void scene5On();
+void scene5Off();
+void scene6On();
+void scene6Off();
+void scene7On();
+void scene8Off();
 
 
 
@@ -99,7 +113,13 @@ int _irCount = 0;
 //Globals 
 boolean wifiConnected = false;
 UpnpBroadcastResponder upnpBroadcastResponder;
-WemoSwitch *office = NULL;
+WemoSwitch *scene1Server = NULL;
+WemoSwitch *scene2Server = NULL;
+WemoSwitch *scene3Server = NULL;
+WemoSwitch *scene4Server = NULL;
+WemoSwitch *scene5Server = NULL;
+WemoSwitch *scene6Server = NULL;
+WemoSwitch *scene7Server = NULL;
 IRsend irsend(0); //an IR led is connected to GPIO pin 0
 FutronixLightController futronix;
 
@@ -150,10 +170,22 @@ void setup()
 
     // Define your switches here. Max 14
     // Format: Alexa invocation name, local port no, on callback, off callback.
-    office = new WemoSwitch("office lights", 80, officeLightsOn, officeLightsOff);
+    scene1Server = new WemoSwitch("scene one",    81, scene1On, scene1Off);
+    scene2Server = new WemoSwitch("scene two",    82, scene2On, scene2Off);
+    scene3Server = new WemoSwitch("scene three",  83, scene3On, scene3Off);
+    scene4Server = new WemoSwitch("scene four",   84, scene4On, scene4Off);
+    scene5Server = new WemoSwitch("scene five",   85, scene5On, scene5Off);
+    scene6Server = new WemoSwitch("scene six",    86, scene6On, scene6Off);
+    scene7Server = new WemoSwitch("scene seven",  87, scene7On, scene7Off);
 
     Serial.println("Adding switches upnp broadcast responder");
-    upnpBroadcastResponder.addDevice(*office);
+    upnpBroadcastResponder.addDevice(*scene1Server);
+    upnpBroadcastResponder.addDevice(*scene2Server);
+    upnpBroadcastResponder.addDevice(*scene3Server);
+    upnpBroadcastResponder.addDevice(*scene4Server);
+    upnpBroadcastResponder.addDevice(*scene5Server);
+    upnpBroadcastResponder.addDevice(*scene6Server);
+    upnpBroadcastResponder.addDevice(*scene7Server);
   }
   #endif
   
@@ -220,7 +252,13 @@ void loop()
     //Wemo
     upnpBroadcastResponder.serverLoop();
 
-    office->serverLoop();
+    scene1Server->serverLoop();
+    scene2Server->serverLoop();
+    scene3Server->serverLoop();
+    scene4Server->serverLoop();
+    scene5Server->serverLoop();
+    scene6Server->serverLoop();
+    scene7Server->serverLoop();
 
     //Futronix
     //futronix.setSceneInZone(0, 12, &irsend);
@@ -361,20 +399,71 @@ void mqttSendMessage () {
     int rc = mqttClient->publish(aws_topic, message); 
 }
 
-/*****************
-   officeLightsOn
-*/
-void officeLightsOn() {
-  Serial.print("Switch 1 turn on ...");
-  ledOn();
+void scene1On() {
+  Serial.print("Scene 1 turn on ...");
+  sceneOn(1); 
+}
+void scene1Off() {
+  Serial.print("Scene 1 turn off ...");
+  sceneOff(1); 
+}
+void scene2On() {
+  Serial.print("Scene 2 turn on ...");
+  sceneOn(2); 
+}
+void scene2Off() {
+  Serial.print("Scene 2 turn off ...");
+  sceneOff(2); 
+}
+void scene3On() {
+  Serial.print("Scene 3 turn on ...");
+  sceneOn(3); 
+}
+void scene3Off() {
+  Serial.print("Scene 3 turn off ...");
+  sceneOff(3); 
+}
+void scene4On() {
+  Serial.print("Scene 4 turn on ...");
+  sceneOn(4); 
+}
+void scene4Off() {
+  Serial.print("Scene 4 turn off ...");
+  sceneOff(4); 
+}
+void scene5On() {
+  Serial.print("Scene 5 turn on ...");
+  sceneOn(5); 
+}
+void scene5Off() {
+  Serial.print("Scene 5 turn off ...");
+  sceneOff(5); 
+}
+void scene6On() {
+  Serial.print("Scene 6 turn on ...");
+  sceneOn(6); 
+}
+void scene6Off() {
+  Serial.print("Scene 6 turn off ...");
+  sceneOff(6); 
+}
+void scene7On() {
+  Serial.print("Scene 7 turn on ...");
+  sceneOn(7); 
+}
+void scene7Off() {
+  Serial.print("Scene 7 turn off ...");
+  sceneOff(7); 
 }
 
-/*****************
-   officeLightsOff
-*/
-void officeLightsOff() {
-  Serial.print("Switch 1 turn off ...");
-  ledOff();
+void sceneOn(int scene)  {
+  //Serial.print("Scene %d turn on...", scene); 
+  ledOn(); 
+}
+
+void sceneOff(int scene)  {
+  //Serial.print("Scene %d turn off...", scene); 
+  ledOff(); 
 }
 
 /*****************
