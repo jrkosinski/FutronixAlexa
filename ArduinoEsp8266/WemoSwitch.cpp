@@ -196,5 +196,5 @@ void WemoSwitch::respondToSearch(IPAddress& senderIP, unsigned int senderPort) {
   UDP.write(response.c_str());
   UDP.endPacket();
 
-   Serial.println("Response sent !");
+  Serial.println("Response sent !");
 }

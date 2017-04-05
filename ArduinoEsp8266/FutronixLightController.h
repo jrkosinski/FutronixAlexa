@@ -7,8 +7,16 @@
 
 class FutronixLightController
 {
+  private: 
+    IRsend* _irSend; //an IR led is connected to GPIO pin 0
+    
   public:
-    void setSceneInZone(int zone, int scene, IRsend* irSend); 
+    FutronixLightController(); 
+    ~FutronixLightController();
+
+    void begin();
+    void setSceneInZone(int zone, int scene); 
+    void tv(); 
 };
 
 #endif

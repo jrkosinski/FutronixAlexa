@@ -47,9 +47,10 @@
 
 
 
-#define __TEST_WEMO__
-//#define __TEST_IR__
+//#define __TEST_WEMO__
+#define __TEST_IR__
 //#define __TEST_AWS__
+//#define __ENABLE_LED__
 
 #define   LED_PIN   2
 
@@ -87,6 +88,8 @@ void scene6On();
 void scene6Off();
 void scene7On();
 void scene8Off();
+void tvOn(); 
+void tvOff(); 
 
 
 
@@ -119,8 +122,8 @@ WemoSwitch *scene3Server = NULL;
 WemoSwitch *scene4Server = NULL;
 WemoSwitch *scene5Server = NULL;
 WemoSwitch *scene6Server = NULL;
-WemoSwitch *scene7Server = NULL;
-IRsend irsend(0); //an IR led is connected to GPIO pin 0
+WemoSwitch *scene7Server = NULL;  
+WemoSwitch *tv = NULL; 
 FutronixLightController futronix;
 
 
@@ -149,14 +152,15 @@ void setup()
   //Serial.begin (115200);
   configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
 
+  #ifdef __ENABLE_LED__
+  Serial.println("LED enabled"); 
   pinMode(LED_PIN, OUTPUT); 
   ledOn();
+  #endif
   
   //IR 
-  #ifdef __TEST_IR__
   Serial.println("testing IR"); 
-  //irsend.begin();
-  #endif 
+  futronix.begin();
 
   
   //WEMO 
@@ -166,29 +170,35 @@ void setup()
   wifiConnected = connectWifi();
 
   if (wifiConnected) {
+    blinkLed(3); 
     upnpBroadcastResponder.beginUdpMulticast();
 
     // Define your switches here. Max 14
     // Format: Alexa invocation name, local port no, on callback, off callback.
-    scene1Server = new WemoSwitch("scene one",    81, scene1On, scene1Off);
-    scene2Server = new WemoSwitch("scene two",    82, scene2On, scene2Off);
-    scene3Server = new WemoSwitch("scene three",  83, scene3On, scene3Off);
-    scene4Server = new WemoSwitch("scene four",   84, scene4On, scene4Off);
-    scene5Server = new WemoSwitch("scene five",   85, scene5On, scene5Off);
-    scene6Server = new WemoSwitch("scene six",    86, scene6On, scene6Off);
-    scene7Server = new WemoSwitch("scene seven",  87, scene7On, scene7Off);
+    //scene1Server = new WemoSwitch("scene one",    81, scene1On, scene1Off);
+    //scene2Server = new WemoSwitch("scene two",    82, scene2On, scene2Off);
+    //scene3Server = new WemoSwitch("scene three",  83, scene3On, scene3Off);
+    //scene4Server = new WemoSwitch("scene four",   84, scene4On, scene4Off);
+    //scene5Server = new WemoSwitch("scene five",   85, scene5On, scene5Off);
+    //scene6Server = new WemoSwitch("scene six",    86, scene6On, scene6Off);
+    //scene7Server = new WemoSwitch("scene seven",  87, scene7On, scene7Off);
+    tv = new WemoSwitch("the tv", 80, tvOn, tvOff); 
 
     Serial.println("Adding switches upnp broadcast responder");
-    upnpBroadcastResponder.addDevice(*scene1Server);
-    upnpBroadcastResponder.addDevice(*scene2Server);
-    upnpBroadcastResponder.addDevice(*scene3Server);
-    upnpBroadcastResponder.addDevice(*scene4Server);
-    upnpBroadcastResponder.addDevice(*scene5Server);
-    upnpBroadcastResponder.addDevice(*scene6Server);
-    upnpBroadcastResponder.addDevice(*scene7Server);
+    //upnpBroadcastResponder.addDevice(*scene1Server);
+    //upnpBroadcastResponder.addDevice(*scene2Server);
+    //upnpBroadcastResponder.addDevice(*scene3Server);
+    //upnpBroadcastResponder.addDevice(*scene4Server);
+    //upnpBroadcastResponder.addDevice(*scene5Server);
+    //upnpBroadcastResponder.addDevice(*scene6Server);
+    //upnpBroadcastResponder.addDevice(*scene7Server);
+    upnpBroadcastResponder.addDevice(*tv);
   }
   #endif
-  
+
+
+  delay(2000); 
+  futronix.tv();
 
   //MQTT
   #ifdef __TEST_AWS__
@@ -201,7 +211,7 @@ void setup()
         Serial.print (".");
     }
     Serial.println ("\nconnected");
-
+ 
     //fill AWS parameters    
     awsWSclient.setAWSRegion(aws_region);
     awsWSclient.setAWSDomain(aws_endpoint);
@@ -222,43 +232,19 @@ void setup()
 */
 void loop()
 {
-  //IR 
-  #ifdef __TEST_IR__
-
-  if (_irCount < 10)
-  {
-    futronix.setSceneInZone(0, 2, &irsend);
-    futronix.setSceneInZone(1, 2, &irsend);
-    futronix.setSceneInZone(2, 2, &irsend);
-    futronix.setSceneInZone(3, 2, &irsend);
-    futronix.setSceneInZone(4, 2, &irsend);
-    futronix.setSceneInZone(5, 2, &irsend);
-    futronix.setSceneInZone(6, 2, &irsend);
-    futronix.setSceneInZone(7, 2, &irsend);
-    futronix.setSceneInZone(8, 2, &irsend);
-    futronix.setSceneInZone(9, 2, &irsend);
-    futronix.setSceneInZone(10, 2, &irsend);
-    futronix.setSceneInZone(11, 2, &irsend);
-    futronix.setSceneInZone(12, 2, &irsend);
-    _irCount++; 
-    blinkLed();
-    delay(5000); 
-  }
-  #endif 
-
-
   #ifdef __TEST_WEMO__
   if (wifiConnected) {
     //Wemo
     upnpBroadcastResponder.serverLoop();
 
-    scene1Server->serverLoop();
-    scene2Server->serverLoop();
-    scene3Server->serverLoop();
-    scene4Server->serverLoop();
-    scene5Server->serverLoop();
-    scene6Server->serverLoop();
-    scene7Server->serverLoop();
+    //scene1Server->serverLoop();
+    //scene2Server->serverLoop();
+    //scene3Server->serverLoop();
+    //scene4Server->serverLoop();
+    //scene5Server->serverLoop();
+    //scene6Server->serverLoop();
+    //scene7Server->serverLoop();
+    tv->serverLoop();
 
     //Futronix
     //futronix.setSceneInZone(0, 12, &irsend);
@@ -269,6 +255,11 @@ void loop()
     //Serial.println("Wifi not connected ...");
   }
   #endif
+
+  Serial.println("setting scene in zone..."); 
+  //futronix.setSceneInZone(0, 3); 
+  futronix.tv(); 
+  delay(5000); 
 }
 
 
@@ -456,13 +447,23 @@ void scene7Off() {
   sceneOff(7); 
 }
 
+void tvOn()
+{
+  futronix.tv();
+}
+
+void tvOff()
+{
+  futronix.tv();
+}
+
 void sceneOn(int scene)  {
-  //Serial.print("Scene %d turn on...", scene); 
+  futronix.setSceneInZone(0, scene); 
   ledOn(); 
 }
 
 void sceneOff(int scene)  {
-  //Serial.print("Scene %d turn off...", scene); 
+  
   ledOff(); 
 }
 
@@ -471,9 +472,10 @@ void sceneOff(int scene)  {
    connect to wifi – returns true if successful or false if not
 */
 boolean connectWifi() {
+/*
   boolean state = true;
   int i = 0;
-
+  
   WiFi.mode(WIFI_STA);
   WiFi.begin(wifi_ssid, wifi_password);
   Serial.println("");
@@ -504,6 +506,18 @@ boolean connectWifi() {
   }
 
   return state;
+  */
+
+  
+    wiFiMulti.addAP(wifi_ssid, wifi_password);
+    Serial.println ("connecting to wifi");
+    while(wiFiMulti.run() != WL_CONNECTED) {
+        delay(100);
+        Serial.print (".");
+    }
+    Serial.println ("\nconnected");
+
+    return true;
 }
 
 
@@ -534,7 +548,9 @@ void blinkLed(unsigned int count)
 */
 void ledOn()
 {
-  digitalWrite(LED_PIN, LOW);
+  #ifdef __ENABLE_LED__
+  digitalWrite(LED_PIN,   );
+  #endif
 }
 
 /*****************
@@ -542,7 +558,9 @@ void ledOn()
 */
 void ledOff()
 {
+  #ifdef __ENABLE_LED__
   digitalWrite(LED_PIN, HIGH);
+  #endif
 }
 
 
