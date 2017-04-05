@@ -22,6 +22,7 @@ class WemoEmulator
     void begin();
     void listen();
     bool addDevice(char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler);
+    bool isRunning; 
 
   private:
     WemoServer* _servers[SERVER_COUNT_LIMIT];
@@ -34,6 +35,7 @@ class WemoEmulator
 WemoEmulator::WemoEmulator()
 {
   this->_serverCount = 0;
+  this->isRunning = false;
 }
 
 WemoEmulator::~WemoEmulator()
@@ -47,7 +49,21 @@ WemoEmulator::~WemoEmulator()
 
 void WemoEmulator::begin()
 {
+  this->isRunning = false;
+  
+  Serial.println("Begin multicast ..");
+  
+  if(this->_udp.beginMulticast(WiFi.localIP(), _ipMulti, this->_portMulti)) {
+    Serial.print("Udp multicast server started at ");
+    Serial.print(_ipMulti);
+    Serial.print(":");
+    Serial.println(this->_portMulti);
 
+    this->isRunning = true;
+  }
+  else{
+    Serial.println("Connection failed");
+  }
 }
 
 void WemoEmulator::listen()
