@@ -30,6 +30,7 @@ class WemoEmulator
     const unsigned int _portMulti = 1900;
     char _packetBuffer[512];
     WiFiUDP _udp;  
+    bool _enabled = false; 
 };
 
 WemoEmulator::WemoEmulator()
@@ -60,6 +61,7 @@ void WemoEmulator::begin()
     Serial.println(this->_portMulti);
 
     this->isRunning = true;
+    this->_enabled = true; 
   }
   else{
     Serial.println("Connection failed");

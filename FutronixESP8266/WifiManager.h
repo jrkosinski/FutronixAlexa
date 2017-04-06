@@ -25,6 +25,7 @@ class WifiManager
     ESP8266WiFiMulti _wiFiMulti;
     char* _wifiPasswd; 
     char* _wifiSsid; 
+    bool _enabled = false; 
 };
 
 WifiManager::WifiManager(char* ssid, char* password)
@@ -36,7 +37,7 @@ WifiManager::WifiManager(char* ssid, char* password)
 
 void WifiManager::begin()
 {
-  
+  this->_enabled = true; 
 }
 
 bool WifiManager::connect()

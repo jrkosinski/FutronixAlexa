@@ -13,20 +13,20 @@
 #define WIFI_PASSWD   "HappyTime"
 
 LEDManager _ledManager;
-IRManager _irManager;
-FutronixInterface _futronix(&_irManager);
+FutronixInterface _futronix;
 WifiManager _wifiManager(WIFI_SSID, WIFI_PASSWD);
 WemoEmulator _wemoEmulator;
 
 void setup()
 {
   Serial.begin(9600);
+  pinMode(IR_PIN, OUTPUT);
   
-  _ledManager.begin();
-  _wifiManager.begin();
-  _irManager.begin();
-  _futronix.begin();
+  //_ledManager.begin();
+  //_wifiManager.begin();
+  //_futronix.begin();
 
+/*
   if (_wifiManager.connect())
   {
     _wemoEmulator.begin();
@@ -35,11 +35,18 @@ void setup()
     _wemoEmulator.addDevice("scene two", 81, new SceneCallbackHandler(&_futronix, 2));
     _wemoEmulator.addDevice("scene three", 82, new SceneCallbackHandler(&_futronix, 3));
   }
+  */
 }
 
 void loop()
 {
-  if (_wemoEmulator.isRunning)
-    _wemoEmulator.listen();
+  digitalWrite(IR_PIN, LOW); 
+  delay(1000);
+  digitalWrite(IR_PIN, HIGH); 
+  delay(1000);
+  //if (_wemoEmulator.isRunning)
+  //  _wemoEmulator.listen();
+
+  //_irManager.test(1);
 }
 

@@ -7,30 +7,24 @@
 class FutronixInterface 
 {
   public: 
-    FutronixInterface(IRManager* irManager); 
-    ~FutronixInterface();
+    FutronixInterface(); 
 
     void begin(); 
     void setScene(int scene); 
 
   private: 
-    IRManager* _irManager; 
+    IRManager _irManager; 
+    bool _enabled = false; 
 };
 
 
-FutronixInterface::FutronixInterface(IRManager* irManager)
+FutronixInterface::FutronixInterface()
 {
-  this->_irManager = irManager;
-}
-
-FutronixInterface::~FutronixInterface()
-{
-  delete this->_irManager; 
 }
 
 void FutronixInterface::begin()
 {
-  this->_irManager->begin(); 
+  this->_enabled = true; 
 }
 
 void FutronixInterface::setScene(int scene)

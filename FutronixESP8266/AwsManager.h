@@ -38,6 +38,7 @@ class AwsManager
     void connectAndListen(); 
 
   private: 
+    bool _enabled = false; 
     MQTT::Client<IPStack, Countdown, maxMQTTpackageSize, maxMQTTMessageHandlers>* _mqttClient = NULL;
     long _connection = 0;
 
@@ -83,6 +84,8 @@ void AwsManager::begin()
   _awsWSclient.setAWSKeyID(AWS_USER);
   _awsWSclient.setAWSSecretKey(AWS_SECRET);
   _awsWSclient.setUseSSL(true);
+
+  this->_enabled = true; 
 }
 
 void AwsManager::connectAndListen()
