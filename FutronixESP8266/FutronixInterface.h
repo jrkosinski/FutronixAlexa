@@ -35,7 +35,7 @@ void FutronixInterface::begin()
 
 void FutronixInterface::setScene(int scene)
 {
-  this->_irManager->getSender()->sendFutronix(17); 
+  //this->_irManager->getSender()->sendFutronix(17); 
 }
 
 #endif

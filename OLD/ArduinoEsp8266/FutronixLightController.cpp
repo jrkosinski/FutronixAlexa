@@ -31,7 +31,7 @@ void FutronixLightController::setSceneInZone(int zone, int scene)
   //this->_irSend->ledOff();
   //return;
    
-   this->_irSend->sendFutronix(17); 
+   //this->_irSend->sendFutronix(17); 
    //delay(5000); 
 
 /*

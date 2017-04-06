@@ -15,12 +15,19 @@
 #include <AWSWebSocketClient.h>
 #include <CircularByteBuffer.h>
 
-#define AWS_ENDPOINT          "a21jd7gud1swyd.iot.us-east-1.amazonaws.com";
-#define AWS_USER              "AKIAIS7JT5B2C5SIKVQQ"; 
-#define AWS_SECRET            "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";
-#define AWS_REGION            "eu-east-1";
-#define AWS_TOPIC             "$aws/things/Sigma/shadow/update";
-#define AWS_PORT              = 443;
+#define AWS_ENDPOINT          "a21jd7gud1swyd.iot.us-east-1.amazonaws.com"
+#define AWS_USER              "AKIAIS7JT5B2C5SIKVQQ"
+#define AWS_SECRET            "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"
+#define AWS_REGION            "eu-east-1"
+#define AWS_TOPIC             "$aws/things/Sigma/shadow/update"
+#define AWS_PORT              443
+
+const int maxMQTTpackageSize = 512;
+const int maxMQTTMessageHandlers = 1;
+
+AWSWebSocketClient _awsWSclient(1000);
+IPStack _ipstack(_awsWSclient);
+int _arrivedCount = 0;
 
 class AwsManager
 {
@@ -31,18 +38,37 @@ class AwsManager
     void connectAndListen(); 
 
   private: 
-    AWSWebSocketClient* _awsWSclient = new AWSWebSocketClient(1000);
-    IPStack* _ipstack = new IPStack(_awsWSclient);
     MQTT::Client<IPStack, Countdown, maxMQTTpackageSize, maxMQTTMessageHandlers>* _mqttClient = NULL;
-    int _arrivedcount = 0;
     long _connection = 0;
 
-    char* generateClientId(); 
+    char* generateClientID(); 
     bool connect(); 
     void subscribe(); 
     void sendMessage();
+    void messageArrived(MQTT::MessageData&);
 }; 
 
+    
+void onMessageArrivedCallback(MQTT::MessageData& md)
+{
+  MQTT::Message &message = md.message;
+
+  Serial.print("Message ");
+  Serial.print(++_arrivedCount);
+  Serial.print(" arrived: qos ");
+  Serial.print(message.qos);
+  Serial.print(", retained ");
+  Serial.print(message.retained);
+  Serial.print(", dup ");
+  Serial.print(message.dup);
+  Serial.print(", packetid ");
+  Serial.println(message.id);
+  Serial.print("Payload ");
+  char* msg = new char[message.payloadlen+1]();
+  memcpy (msg,message.payload,message.payloadlen);
+  Serial.println(msg);
+  delete msg;
+}
 
 AwsManager::AwsManager()
 {
@@ -52,11 +78,11 @@ AwsManager::AwsManager()
 void AwsManager::begin()
 {
   //fill AWS parameters    
-  this->_awsWSclient.setAWSRegion(AWS_REGION);
-  this->_awsWSclient.setAWSDomain(AWS_ENDPOINT);
-  this->_awsWSclient.setAWSKeyID(AWS_USER);
-  this->_awsWSclient.setAWSSecretKey(AWS_SECRET);
-  this->_awsWSclient.setUseSSL(true);
+  _awsWSclient.setAWSRegion(AWS_REGION);
+  _awsWSclient.setAWSDomain(AWS_ENDPOINT);
+  _awsWSclient.setAWSKeyID(AWS_USER);
+  _awsWSclient.setAWSSecretKey(AWS_SECRET);
+  _awsWSclient.setUseSSL(true);
 }
 
 void AwsManager::connectAndListen()
@@ -75,31 +101,10 @@ char* AwsManager::generateClientID ()
   return cID;
 }
 
-void AwsManager::messageArrived(MQTT::MessageData& md)
-{
-  MQTT::Message &message = md.message;
-
-  Serial.print("Message ");
-  Serial.print(++arrivedcount);
-  Serial.print(" arrived: qos ");
-  Serial.print(message.qos);
-  Serial.print(", retained ");
-  Serial.print(message.retained);
-  Serial.print(", dup ");
-  Serial.print(message.dup);
-  Serial.print(", packetid ");
-  Serial.println(message.id);
-  Serial.print("Payload ");
-  char* msg = new char[message.payloadlen+1]();
-  memcpy (msg,message.payload,message.payloadlen);
-  Serial.println(msg);
-  delete msg;
-}
-
 bool AwsManager::connect () 
 {
   if (this->_mqttClient == NULL) {
-    this->_mqttClient = new MQTT::Client<IPStack, Countdown, maxMQTTpackageSize, maxMQTTMessageHandlers>(ipstack);
+    this->_mqttClient = new MQTT::Client<IPStack, Countdown, maxMQTTpackageSize, maxMQTTMessageHandlers>(_ipstack);
   } 
   else 
   {
@@ -116,13 +121,13 @@ bool AwsManager::connect ()
   delay (1000);
   Serial.print (millis ());
   Serial.print (" - conn: ");
-  Serial.print (++connection);
+  Serial.print (++_connection);
   Serial.print (" - (");
   Serial.print (ESP.getFreeHeap ());
   Serial.println (")");
 
 
-  int rc = ipstack.connect(aws_endpoint, port);
+  int rc = _ipstack.connect(AWS_ENDPOINT, AWS_PORT);
   if (rc != 1)
   {
     Serial.println("error connection to the websocket server");
@@ -137,9 +142,9 @@ bool AwsManager::connect ()
   MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
   data.MQTTVersion = 3;
 
-  char* clientID = generateClientID ();
+  char* clientID = this->generateClientID ();
   data.clientID.cstring = clientID;
-  rc = mqttClient->connect(data);
+  rc = _mqttClient->connect(data);
   delete[] clientID;
   if (rc != 0) {
     Serial.print("error connection to MQTT server");
@@ -153,7 +158,7 @@ bool AwsManager::connect ()
 void AwsManager::subscribe () 
 {
   //subscript to a topic
-  int rc = this->_mqttClient->subscribe(AWS_TOPIC, MQTT::QOS0, messageArrived);
+  int rc = _mqttClient->subscribe(AWS_TOPIC, MQTT::QOS0, onMessageArrivedCallback);
   if (rc != 0) {
     Serial.print("rc from MQTT subscribe is ");
     Serial.println(rc);
