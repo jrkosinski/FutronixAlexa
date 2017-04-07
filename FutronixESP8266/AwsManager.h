@@ -16,8 +16,8 @@
 #include <CircularByteBuffer.h>
 
 #define AWS_ENDPOINT          "a21jd7gud1swyd.iot.us-east-1.amazonaws.com"
-#define AWS_USER              "AKIAIS7JT5B2C5SIKVQQ"
-#define AWS_SECRET            "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"
+#define AWS_USER              "XXXXXXXXXXXXXXX"
+#define AWS_SECRET            "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 #define AWS_REGION            "eu-east-1"
 #define AWS_TOPIC             "$aws/things/Sigma/shadow/update"
 #define AWS_PORT              443

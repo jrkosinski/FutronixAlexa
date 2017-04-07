@@ -2,6 +2,8 @@
 #ifndef __WIFI_MANAGER_H__
 #define __WIFI_MANAGER_H__
 
+#define WIFI_SSID "Mina";
+#define WIFI_PASSWD "HappyTime";
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
@@ -23,17 +25,17 @@ class WifiManager
     bool isConnected; 
     
   public:
-    WifiManager(char* ssid, char* password); 
+    WifiManager(); 
 
     void begin(); 
     bool connect(); 
 };
 
-WifiManager::WifiManager(char* ssid, char* password)
+WifiManager::WifiManager()
 {
   this->isConnected = false;
-  this->_wifiSsid = ssid; 
-  this->_wifiPasswd = password; 
+  this->_wifiSsid = WIFI_SSID; 
+  this->_wifiPasswd = WIFI_PASSWD; 
 }
 
 void WifiManager::begin()

@@ -1,7 +1,7 @@
 #ifndef __SCENE_CALLBACK_HANDLER_H__
 #define __SCENE_CALLBACK_HANDLER_H__
 
-#include "FutronixInterface.h"
+#include "CommandInterface.h"
 #include "WemoEmulator.h"
 #include "DatabaseManager.h"
 
@@ -9,10 +9,10 @@ class SceneNumberCallbackHandler : public IWemoCallbackHandler
 {
   private: 
     int _sceneNo; 
-    FutronixInterface* _futronix; 
+    CommandInterface* _command; 
     
   public: 
-    SceneNumberCallbackHandler(FutronixInterface* futronix, int sceneNo); 
+    SceneNumberCallbackHandler(CommandInterface* command, int sceneNo); 
 
     virtual void handleCallback(int param); 
 }; 
@@ -23,33 +23,35 @@ class SceneNameCallbackHandler : public IWemoCallbackHandler
   private: 
     char* _sceneName; 
     DatabaseManager* _dbManager; 
-    FutronixInterface* _futronix; 
+    CommandInterface* _command; 
     
   public: 
-    SceneNameCallbackHandler(FutronixInterface* futronix, DatabaseManager* dbManager, char* sceneName); 
+    SceneNameCallbackHandler(CommandInterface* command, DatabaseManager* dbManager, char* sceneName); 
 
     virtual void handleCallback(int param); 
 }; 
 
 
-SceneNumberCallbackHandler::SceneNumberCallbackHandler(FutronixInterface* futronix, int sceneNo)
+SceneNumberCallbackHandler::SceneNumberCallbackHandler(CommandInterface* command, int sceneNo)
 {
   this->_sceneNo = sceneNo;
+  this->_command = command; 
 }
 
 void SceneNumberCallbackHandler::handleCallback(int param)
 {
   if (param)
   {
-    this->_futronix->setScene(this->_sceneNo); 
+    this->_command->setScene(this->_sceneNo); 
   }
 }
 
 
-SceneNameCallbackHandler::SceneNameCallbackHandler(FutronixInterface* futronix, DatabaseManager* dbManager, char* sceneName)
+SceneNameCallbackHandler::SceneNameCallbackHandler(CommandInterface* command, DatabaseManager* dbManager, char* sceneName)
 {
   this->_sceneName = _sceneName;
   this->_dbManager = dbManager; 
+  this->_command = command; 
 }
 
 void SceneNameCallbackHandler::handleCallback(int param)
@@ -61,7 +63,7 @@ void SceneNameCallbackHandler::handleCallback(int param)
     if (record != 0)
     {
       sceneNo = record->getSceneNumber(); 
-      this->_futronix->setScene(sceneNo); 
+      this->_command->setScene(sceneNo); 
     }
   }
 }

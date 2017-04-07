@@ -4,14 +4,14 @@
 
 #include "IRManager.h"
 
-class FutronixInterface 
+class CommandInterface 
 {
   private: 
     IRManager _irManager; 
     bool _enabled = false; 
     
   public: 
-    FutronixInterface(); 
+    CommandInterface(); 
 
     void begin(); 
     void test(); 
@@ -19,22 +19,22 @@ class FutronixInterface
 };
 
 
-FutronixInterface::FutronixInterface()
+CommandInterface::CommandInterface()
 {
 }
 
-void FutronixInterface::begin()
+void CommandInterface::begin()
 {
   this->_enabled = true; 
   this->_irManager.begin();
 }
 
-void FutronixInterface::test()
+void CommandInterface::test()
 {
   this->_irManager.test(1);
 }
 
-void FutronixInterface::setScene(int scene)
+void CommandInterface::setScene(int scene)
 {
   //this->_irManager->getSender()->sendFutronix(17); 
 }

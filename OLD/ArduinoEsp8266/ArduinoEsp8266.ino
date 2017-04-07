@@ -99,8 +99,8 @@ const char* wifi_ssid              = "mina";
 const char* wifi_password          = "HappyTime";
 
 char aws_endpoint[]           = "a21jd7gud1swyd.iot.us-east-1.amazonaws.com";
-char aws_key[]                = "AKIAIS7JT5B2C5SIKVQQ"; 
-char aws_secret[]             = "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";
+char aws_key[]                = "XXXXXXXXXXXXXXXX"; 
+char aws_secret[]             = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 char aws_region[]             = "eu-east-1";
 const char* aws_topic         = "$aws/things/Sigma/shadow/update";
 const int port                = 443;

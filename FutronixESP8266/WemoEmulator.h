@@ -56,7 +56,8 @@ void WemoEmulator::begin()
   
   Serial.println("Begin multicast ..");
   
-  if(this->_udp.beginMulticast(WiFi.localIP(), _ipMulti, this->_portMulti)) {
+  if (this->_udp.beginMulticast(WiFi.localIP(), _ipMulti, this->_portMulti)) 
+  {
     Serial.print("Udp multicast server started at ");
     Serial.print(_ipMulti);
     Serial.print(":");
@@ -65,7 +66,8 @@ void WemoEmulator::begin()
     this->isRunning = true;
     this->_enabled = true; 
   }
-  else{
+  else
+  {
     Serial.println("Connection failed");
   }
 }
