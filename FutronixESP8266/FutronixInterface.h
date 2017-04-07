@@ -10,6 +10,7 @@ class FutronixInterface
     FutronixInterface(); 
 
     void begin(); 
+    void test(); 
     void setScene(int scene); 
 
   private: 
@@ -25,6 +26,12 @@ FutronixInterface::FutronixInterface()
 void FutronixInterface::begin()
 {
   this->_enabled = true; 
+  this->_irManager.begin();
+}
+
+void FutronixInterface::test()
+{
+  this->_irManager.test(1);
 }
 
 void FutronixInterface::setScene(int scene)

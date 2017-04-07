@@ -4,18 +4,21 @@
 
 #include <EEPROM.h>
 
-#define EEPROM_SIZE 512
+#define EEPROM_SIZE 4096
 
 class EEPROMManager 
 {
   public: 
-    DatabaseManager(); 
+    EEPROMManager(); 
 
     void begin(); 
     void readRaw(char* buffer, int len); 
     void readAllRaw(char* buffer); 
     void readString(char* buffer, int len); 
     void readAllString(char* buffer); 
+    void write(char* buffer, int len);
+    void writeString(char* buffer); 
+    void clear(); 
 
   private: 
     bool _enabled = false; 
@@ -86,6 +89,12 @@ void EEPROMManager::write(char* buffer, int len)
   this->doWrite(buffer, 0, len, false, (len < EEPROM_SIZE)); 
 }
 
+void EEPROMManager::writeString(char* buffer)
+{
+  int len = strlen(buffer);
+  this->doWrite(buffer, 0, len, true, (len < EEPROM_SIZE)); 
+}
+
 void EEPROMManager::doWrite(char* buffer, int start, int len, bool stopOnNull, bool terminateString)
 {
   if (this->_enabled)
@@ -105,11 +114,6 @@ void EEPROMManager::doWrite(char* buffer, int start, int len, bool stopOnNull, b
     
     this->close();
   }
-}
-
-void EEPROMManager::writeString(char* buffer)
-{
-  this->doWrite(buffer, 0, len, true, (len < EEPROM_SIZE)); 
 }
 
 void EEPROMManager::clear()

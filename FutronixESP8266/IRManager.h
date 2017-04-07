@@ -2,7 +2,7 @@
 #ifndef __IR_MANAGER_H__
 #define __IR_MANAGER_H__
 
-#define IR_PIN              2
+#define IR_PIN              0
 #define FUTRONIX_INTERVAL   1560
 
 class IRManager
@@ -78,16 +78,12 @@ void IRManager::begin()
 
 void IRManager::test(int repeat)
 {
-  if (this->_enabled)
+  for(int n=0; n<repeat; n++)
   {
-    Serial.println("testing IR"); 
-    for(int n=0; n<repeat; n++)
-    {
-      this->pinOn(); 
-      delay(1000); 
-      this->pinOff(); 
-      delay(1000); 
-    }
+    Serial.println("testing"); 
+    this->mark(1000);
+    this->pinOff(); 
+    delay(4000); 
   }
 }
 
@@ -150,6 +146,7 @@ void IRManager::mark(unsigned int usec)
     this->pinOff();
     // e.g. 38 kHz -> T = 26.31 microsec (periodic time), half of it is 13
     delayMicroseconds(_halfPeriodicTime);
+    Serial.println("one cycle");
   }
 }
 
