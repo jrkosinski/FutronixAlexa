@@ -13,6 +13,10 @@
 #include <WiFiUdp.h>
 
 
+/****************************************
+ * WifiManager
+ * -----------
+ */
 class WifiManager
 {
   private: 
@@ -30,7 +34,9 @@ class WifiManager
     void begin(); 
     bool connect(); 
 };
+/****************************************/
 
+/*---------------------------------------*/
 WifiManager::WifiManager()
 {
   this->isConnected = false;
@@ -38,11 +44,13 @@ WifiManager::WifiManager()
   this->_wifiPasswd = WIFI_PASSWD; 
 }
 
+/*---------------------------------------*/
 void WifiManager::begin()
 {
   this->_enabled = true; 
 }
 
+/*---------------------------------------*/
 bool WifiManager::connect()
 {
   this->_wiFiMulti.addAP(this->_wifiSsid, this->_wifiPasswd);

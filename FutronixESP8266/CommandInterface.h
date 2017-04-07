@@ -4,6 +4,11 @@
 
 #include "IRManager.h"
 
+/****************************************
+ * CommandInterface
+ * ----------------
+ * Interface for sending Futronix-specific commands to the Futronix chip. 
+ */
 class CommandInterface 
 {
   private: 
@@ -17,23 +22,28 @@ class CommandInterface
     void test(); 
     void setScene(int scene); 
 };
+/****************************************/
 
 
+/*---------------------------------------*/
 CommandInterface::CommandInterface()
 {
 }
 
+/*---------------------------------------*/
 void CommandInterface::begin()
 {
   this->_enabled = true; 
   this->_irManager.begin();
 }
 
+/*---------------------------------------*/
 void CommandInterface::test()
 {
   this->_irManager.test(1);
 }
 
+/*---------------------------------------*/
 void CommandInterface::setScene(int scene)
 {
   //this->_irManager->getSender()->sendFutronix(17); 

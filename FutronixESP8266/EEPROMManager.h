@@ -6,6 +6,11 @@
 
 #define EEPROM_SIZE 4096
 
+/****************************************
+ * EEPROMManager
+ * -------------
+ * Read/write interface to the EEPROM memory. 
+ */
 class EEPROMManager 
 {
   private: 
@@ -33,47 +38,57 @@ class EEPROMManager
     void open(); 
     void close(); 
 };
+/****************************************/
 
 
+/*---------------------------------------*/
 EEPROMManager::EEPROMManager()
 {
 }
 
+/*---------------------------------------*/
 void EEPROMManager::begin()
 {
   this->_enabled = true; 
 }
 
+/*---------------------------------------*/
 void EEPROMManager::readRaw(char* buffer, int len)
 {
   this->readRaw(buffer, 0, len); 
 }
 
+/*---------------------------------------*/
 void EEPROMManager::readRaw(char* buffer, int start, int len)
 {
   this->doRead(buffer, start, len, false, false); 
 }
 
+/*---------------------------------------*/
 void EEPROMManager::readAllRaw(char* buffer)
 {
   this->readRaw(buffer, 0, EEPROM_SIZE); 
 }
 
+/*---------------------------------------*/
 void EEPROMManager::readString(char* buffer, int len)
 {
   this->readString(buffer, 0, len); 
 }
 
+/*---------------------------------------*/
 void EEPROMManager::readString(char* buffer, int start, int len)
 {
   this->doRead(buffer, start, len, true, true); 
 }
 
+/*---------------------------------------*/
 void EEPROMManager::readAllString(char* buffer)
 {
   this->readString(buffer, 0, EEPROM_SIZE+1); 
 }
 
+/*---------------------------------------*/
 void EEPROMManager::doRead(char* buffer, int start, int len, bool stopOnNull, bool terminateString)
 {
   if (this->_enabled)
@@ -100,23 +115,27 @@ void EEPROMManager::doRead(char* buffer, int start, int len, bool stopOnNull, bo
   }
 }
 
+/*---------------------------------------*/
 void EEPROMManager::write(char* buffer, int len)
 {
   this->doWrite(buffer, 0, len, false, (len < EEPROM_SIZE)); 
 }
 
+/*---------------------------------------*/
 void EEPROMManager::writeString(char* buffer)
 {
   int len = strlen(buffer);
   this->doWrite(buffer, 0, len, true, (len < EEPROM_SIZE)); 
 }
 
+/*---------------------------------------*/
 void EEPROMManager::writeString(char* buffer, int start)
 {
   int len = strlen(buffer);
   this->doWrite(buffer, start, len, true, (len < EEPROM_SIZE)); 
 }
 
+/*---------------------------------------*/
 void EEPROMManager::doWrite(char* buffer, int start, int len, bool stopOnNull, bool terminateString)
 {
   if (this->_enabled)
@@ -138,6 +157,7 @@ void EEPROMManager::doWrite(char* buffer, int start, int len, bool stopOnNull, b
   }
 }
 
+/*---------------------------------------*/
 void EEPROMManager::clear()
 {
   if (this->_enabled)
@@ -153,12 +173,14 @@ void EEPROMManager::clear()
   }
 }
 
+/*---------------------------------------*/
 void EEPROMManager::open()
 {
   if (this->_enabled)
     EEPROM.begin(EEPROM_SIZE);
 }
 
+/*---------------------------------------*/
 void EEPROMManager::close()
 {
   if (this->_enabled)

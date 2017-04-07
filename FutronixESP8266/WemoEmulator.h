@@ -13,6 +13,12 @@
 
 IPAddress _ipMulti(239, 255, 255, 250);
 
+/****************************************
+ * WemoEmulator
+ * ------------
+ * Handles the wemo-emulating servers, and also the initial UDP request 
+ * from the Alexa, scanning for devices on the network. 
+ */
 class WemoEmulator
 {
   private:
@@ -34,13 +40,16 @@ class WemoEmulator
     void listen();
     bool addDevice(char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler);
 };
+/****************************************/
 
+/*---------------------------------------*/
 WemoEmulator::WemoEmulator()
 {
   this->_serverCount = 0;
   this->isRunning = false;
 }
 
+/*---------------------------------------*/
 WemoEmulator::~WemoEmulator()
 {
   for (int n = 0; n < this->_serverCount; n++)
@@ -50,6 +59,7 @@ WemoEmulator::~WemoEmulator()
   this->_serverCount = 0;
 }
 
+/*---------------------------------------*/
 void WemoEmulator::begin()
 {
   this->isRunning = false;
@@ -72,6 +82,7 @@ void WemoEmulator::begin()
   }
 }
 
+/*---------------------------------------*/
 void WemoEmulator::listen()
 {
   int packetSize = this->_udp.parsePacket();
@@ -110,6 +121,7 @@ void WemoEmulator::listen()
   }
 }
 
+/*---------------------------------------*/
 bool WemoEmulator::addDevice(char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler)
 {
   if (this->_serverCount < SERVER_COUNT_LIMIT)

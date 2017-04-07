@@ -6,6 +6,10 @@
 //TODO: run more than one instance on the wifi network
 #define ADMIN_SERVER_PORT 1001 
 
+/****************************************
+ * AdminServer
+ * -----------
+ */
 class AdminServer
 {
   private 
@@ -18,6 +22,7 @@ class AdminServer
     begin(); 
 
   private: 
+    //request handlers 
     void handleGetSceneNames(); 
     void handleClearSceneNames(); 
     void handleRenameScene(); 
@@ -25,12 +30,14 @@ class AdminServer
     void handleGetCurrentScene(); 
     void handleRestartWemoServers(); 
 };
+/****************************************/
 
 AdminServer::AdminServer()
 {
   
 }
 
+/*---------------------------------------*/
 void AdminServer::begin()
 {
   this->_server = new ESP8266WebServer(this->_localPort);
@@ -65,31 +72,37 @@ void AdminServer::begin()
   Serial.println(_localPort);
 }
 
+/*---------------------------------------*/
 void AdminServer::handleGetSceneNames()
 {
    
 }
 
+/*---------------------------------------*/
 void AdminServer::handleClearSceneNames()
 {
    
 }
 
+/*---------------------------------------*/
 void AdminServer::handleRenameScene()
 {
    
 }
 
+/*---------------------------------------*/
 void AdminServer::handleSetScene()
 {
    
 }
 
+/*---------------------------------------*/
 void AdminServer::handleGetCurrentScene()
 {
    
 }
  
+/*---------------------------------------*/
 void AdminServer::handleRestartWemoServers()
 {
    

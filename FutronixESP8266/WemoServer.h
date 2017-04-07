@@ -9,12 +9,21 @@
 
 #define SERVER_COUNT_LIMIT 20
 
+/****************************************
+ * IWemoCallbackHandler
+ * --------------------
+ */
 class IWemoCallbackHandler
 {
   public:
     virtual void handleCallback(int param);
 };
 
+/****************************************
+ * WemoServer
+ * ----------
+ * Web server interface for one single wemo device or command (e.g. "turn on X")
+ */
 class WemoServer
 {
   private:
@@ -40,6 +49,7 @@ class WemoServer
     void handleRoot(); 
     void handleSetupXml();
 };
+/****************************************/
 
 
 

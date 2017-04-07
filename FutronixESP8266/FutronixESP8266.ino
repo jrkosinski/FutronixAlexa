@@ -26,6 +26,11 @@
 #include "AwsManager.h"
 #include "DatabaseManager.h"
 
+/****************************************
+ * FutronixESP8266
+ * ---------------
+ * The main interface for all functionality on this chip. 
+ */
 class FutronixESP8266
 {
   private:
@@ -51,9 +56,11 @@ class FutronixESP8266
   private:
     void startWemoServers();
 };
+/****************************************/
 
 FutronixESP8266 futronix; 
 
+/*---------------------------------------*/
 void setup()
 {
   Serial.begin(9600);
@@ -61,6 +68,7 @@ void setup()
   futronix.begin();
 }
 
+/*---------------------------------------*/
 void loop()
 {
   futronix.loop();
@@ -68,11 +76,13 @@ void loop()
 
 
 
+/*---------------------------------------*/
 FutronixESP8266::FutronixESP8266()
 {
   
 }
 
+/*---------------------------------------*/
 void FutronixESP8266::begin()
 {
   //this->_ledManager.begin();
@@ -90,26 +100,33 @@ void FutronixESP8266::begin()
   */
 }
 
+/*---------------------------------------*/
 void FutronixESP8266::loop()
 {
   
 }
 
+/*---------------------------------------*/
 void FutronixESP8266::startWemoServers()
 {
   int baseNumberPort = 80; 
   int baseNamePort = baseNumberPort + this->_dbManager.getRecordCount(); 
 
+  //read all records from EEPROM
   DatabaseRecord* records = this->_dbManager.getAllRecords(); 
-  
+
+  //add wemo server/listeners for every scene & scene name 
   for(int n=0; n<this->_dbManager.getRecordCount(); n++)
   {
     char buffer[10]; 
     memcpy(buffer, "scene ", strlen("scene ")); 
     char* pBuf = buffer; 
     itoa((n+1), pBuf+strlen(buffer), 10); 
-    
+
+    //scene numbers 
     this->_wemoEmulator.addDevice(buffer, baseNumberPort+n, new SceneNumberCallbackHandler(&this->_command, n));
+
+    //scene names 
     this->_wemoEmulator.addDevice(buffer, baseNamePort+n, new SceneNameCallbackHandler(&this->_command, &this->_dbManager, records[n].getData())); 
   }
 }

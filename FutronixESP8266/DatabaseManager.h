@@ -8,6 +8,12 @@
 #define MAX_SCENES          12
 
 
+/****************************************
+ * DatabaseRecord
+ * --------------
+ * One database fixed-length record. 
+ * Consists of an integer index, and a string of data. 
+ */
 class DatabaseRecord
 {
   private: 
@@ -38,7 +44,12 @@ class DatabaseRecord
     char* getData() { return this->_data; }
     int getSceneNumber() { return this->Index+1;}
 };
+/****************************************/
 
+/****************************************
+ * DatabaseManager
+ * ---------------
+ */
 class DatabaseManager 
 {
   private: 
@@ -61,19 +72,23 @@ class DatabaseManager
     void clear();
     void test(); 
 };
+/****************************************/
 
 
+/*---------------------------------------*/
 DatabaseManager::DatabaseManager()
 {
   for(int n=0; n<MAX_SCENES; n++)
     this->_allRecords[n].Index = n; 
 }
 
+/*---------------------------------------*/
 unsigned int DatabaseManager::getRecordCount()
 {
   return MAX_SCENES; 
 }
 
+/*---------------------------------------*/
 DatabaseRecord* DatabaseManager::getRecord(unsigned int recordIndex)
 {
   if (recordIndex >= MAX_SCENES)
@@ -85,6 +100,7 @@ DatabaseRecord* DatabaseManager::getRecord(unsigned int recordIndex)
   return &(this->_allRecords[recordIndex]); 
 }
 
+/*---------------------------------------*/
 DatabaseRecord* DatabaseManager::getRecordByName(char* name)
 {
   for(int n=0; n<MAX_SCENES; n++)
@@ -96,6 +112,7 @@ DatabaseRecord* DatabaseManager::getRecordByName(char* name)
   return 0; 
 }
 
+/*---------------------------------------*/
 void DatabaseManager::setRecord(unsigned int recordIndex, char* data)
 {
   if (recordIndex >= MAX_SCENES)
@@ -108,6 +125,7 @@ void DatabaseManager::setRecord(unsigned int recordIndex, char* data)
   this->_eeprom.writeString(this->_allRecords[recordIndex].getData(), recordIndex); 
 }
 
+/*---------------------------------------*/
 DatabaseRecord* DatabaseManager::getAllRecords()
 {
   int len = MAX_SCENES * RECORD_FIXED_SIZE;
@@ -127,6 +145,7 @@ DatabaseRecord* DatabaseManager::getAllRecords()
   return this->_allRecords; 
 }
 
+/*---------------------------------------*/
 void DatabaseManager::begin()
 {
   Serial.println("DB: begin"); 
@@ -135,12 +154,14 @@ void DatabaseManager::begin()
   this->getAllRecords();
 }
 
+/*---------------------------------------*/
 void DatabaseManager::clear()
 {
   Serial.println("DB: Clearing"); 
   this->_eeprom.clear();
 }
 
+/*---------------------------------------*/
 void DatabaseManager::save()
 {
   Serial.println("DB: Saving"); 
@@ -158,6 +179,7 @@ void DatabaseManager::save()
   this->_eeprom.write(buffer, len); 
 }
 
+/*---------------------------------------*/
 void DatabaseManager::test()
 {
   this->_eeprom.clear(); 

@@ -5,6 +5,10 @@
 #include "WemoEmulator.h"
 #include "DatabaseManager.h"
 
+/****************************************
+ * SceneNumberCallbackHandler
+ * --------------------------
+ */
 class SceneNumberCallbackHandler : public IWemoCallbackHandler 
 {
   private: 
@@ -16,8 +20,12 @@ class SceneNumberCallbackHandler : public IWemoCallbackHandler
 
     virtual void handleCallback(int param); 
 }; 
+/****************************************/
 
-
+/****************************************
+ * SceneNameCallbackHandler
+ * ------------------------
+ */
 class SceneNameCallbackHandler : public IWemoCallbackHandler 
 {
   private: 
@@ -30,14 +38,17 @@ class SceneNameCallbackHandler : public IWemoCallbackHandler
 
     virtual void handleCallback(int param); 
 }; 
+/****************************************/
 
 
+/*---------------------------------------*/
 SceneNumberCallbackHandler::SceneNumberCallbackHandler(CommandInterface* command, int sceneNo)
 {
   this->_sceneNo = sceneNo;
   this->_command = command; 
 }
 
+/*---------------------------------------*/
 void SceneNumberCallbackHandler::handleCallback(int param)
 {
   if (param)
@@ -46,7 +57,7 @@ void SceneNumberCallbackHandler::handleCallback(int param)
   }
 }
 
-
+/*---------------------------------------*/
 SceneNameCallbackHandler::SceneNameCallbackHandler(CommandInterface* command, DatabaseManager* dbManager, char* sceneName)
 {
   this->_sceneName = _sceneName;
@@ -54,6 +65,7 @@ SceneNameCallbackHandler::SceneNameCallbackHandler(CommandInterface* command, Da
   this->_command = command; 
 }
 
+/*---------------------------------------*/
 void SceneNameCallbackHandler::handleCallback(int param)
 {
   if (param)

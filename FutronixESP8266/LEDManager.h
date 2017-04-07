@@ -4,6 +4,11 @@
 
 #define   LED_PIN   2
 
+/****************************************
+ * LEDManager
+ * ----------
+ * Controls the LED light on pin 2. 
+ */
 class LEDManager
 {
   private: 
@@ -18,19 +23,23 @@ class LEDManager
     void blink(); 
     void blink(int);     
 };
+/****************************************/
 
 
+/*---------------------------------------*/
 LEDManager::LEDManager()
 {
   this->_enabled = false;
 }
 
+/*---------------------------------------*/
 void LEDManager::begin()
 {
   pinMode(LED_PIN, OUTPUT); 
   this->_enabled = true;
 }
 
+/*---------------------------------------*/
 void LEDManager::ledOn()
 {
   if (this->_enabled)
@@ -39,6 +48,7 @@ void LEDManager::ledOn()
   }
 }
 
+/*---------------------------------------*/
 void LEDManager::ledOff()
 {
   if (this->_enabled)
@@ -47,11 +57,13 @@ void LEDManager::ledOff()
   }
 }
 
+/*---------------------------------------*/
 void LEDManager::blink()
 {
   this->blink(1); 
 }
 
+/*---------------------------------------*/
 void LEDManager::blink(int times)
 {
   for(int i=0; i<times; i++)

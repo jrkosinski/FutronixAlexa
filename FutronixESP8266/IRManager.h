@@ -5,6 +5,11 @@
 #define IR_PIN              0
 #define FUTRONIX_INTERVAL   1560
 
+/****************************************
+ * IRManager
+ * ---------
+ * Transmits infrared pulses through a selected pin. 
+ */
 class IRManager
 {
   private: 
@@ -28,8 +33,13 @@ class IRManager
     void space(unsigned long usec);
     void doSendFutronix(unsigned long command, int headerType, int footerType, bool reverse, int bitmark);
 };
+/****************************************/
 
 
+/****************************************
+ * IRtimer
+ * -------
+ */
 class IRtimer 
 {
   public:
@@ -40,16 +50,19 @@ class IRtimer
   private:
     uint32_t start;
 };
+/****************************************/
 
-// IRtimer ---------------------------------------------------------------------
+/*---------------------------------------*/
 IRtimer::IRtimer() {
   reset();
 }
 
+/*---------------------------------------*/
 void IRtimer::reset() {
   start = micros();
 }
 
+/*---------------------------------------*/
 uint32_t IRtimer::elapsed() {
   uint32_t now = micros();
   if (start <= now)  // Check if the system timer has wrapped.
@@ -58,17 +71,19 @@ uint32_t IRtimer::elapsed() {
     return (0xFFFFFFFF - start + now);  // Has wrapped.
 }
 
-// IRManager ---------------------------------------------------------------------
+/*---------------------------------------*/
 IRManager::IRManager()
 {
   this->_pin = IR_PIN; 
   this->_enabled = false; 
 }
 
+/*---------------------------------------*/
 IRManager::~IRManager()
 {
 }
 
+/*---------------------------------------*/
 void IRManager::begin()
 {
   this->_enabled = true; 
@@ -77,6 +92,7 @@ void IRManager::begin()
   pinMode(IR_PIN, OUTPUT);
 }
 
+/*---------------------------------------*/
 void IRManager::test(int repeat)
 {
   for(int n=0; n<repeat; n++)
@@ -88,6 +104,7 @@ void IRManager::test(int repeat)
   }
 }
 
+/*---------------------------------------*/
 void IRManager::sendFutronix(unsigned long command) 
 {
   if (this->_enabled)
@@ -135,6 +152,7 @@ void IRManager::sendFutronix(unsigned long command)
   }
 }
 
+/*---------------------------------------*/
 void IRManager::mark(unsigned int usec) 
 {
   // Sends an IR mark for the specified number of microseconds.
@@ -151,16 +169,19 @@ void IRManager::mark(unsigned int usec)
   }
 }
 
+/*---------------------------------------*/
 void IRManager::pinOn() 
 {
   digitalWrite(IR_PIN, LOW);
 }
 
+/*---------------------------------------*/
 void IRManager::pinOff() 
 {
   digitalWrite(IR_PIN, HIGH);
 }
 
+/*---------------------------------------*/
 /* Leave pin off for time (given in microseconds) */
 void IRManager::space(unsigned long time) 
 {
@@ -177,6 +198,7 @@ void IRManager::space(unsigned long time)
   }
 }
 
+/*---------------------------------------*/
 void IRManager::enableIROut(int khz) 
 {
   // Enables IR output.
@@ -186,6 +208,7 @@ void IRManager::enableIROut(int khz)
   _halfPeriodicTime = 500/khz;
 }
 
+/*---------------------------------------*/
 void IRManager::doSendFutronix(unsigned long command, int headerType, int footerType, bool reverse, int bitmark) {
   
   // Set IR carrier frequency

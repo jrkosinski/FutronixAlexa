@@ -29,6 +29,10 @@ AWSWebSocketClient _awsWSclient(1000);
 IPStack _ipstack(_awsWSclient);
 int _arrivedCount = 0;
 
+/****************************************
+ * AwsManager
+ * ----------
+ */
 class AwsManager
 {
   private: 
@@ -49,6 +53,7 @@ class AwsManager
     void sendMessage();
     void messageArrived(MQTT::MessageData&);
 }; 
+/****************************************/
 
     
 void onMessageArrivedCallback(MQTT::MessageData& md)
@@ -72,11 +77,13 @@ void onMessageArrivedCallback(MQTT::MessageData& md)
   delete msg;
 }
 
+/*---------------------------------------*/
 AwsManager::AwsManager()
 {
   
 }
 
+/*---------------------------------------*/
 void AwsManager::begin()
 {
   //fill AWS parameters    
@@ -89,6 +96,7 @@ void AwsManager::begin()
   this->_enabled = true; 
 }
 
+/*---------------------------------------*/
 void AwsManager::connectAndListen()
 {
   if (this->connect ()){
@@ -97,6 +105,7 @@ void AwsManager::connectAndListen()
   }
 }
 
+/*---------------------------------------*/
 char* AwsManager::generateClientID () 
 {
   char* cID = new char[23]();
@@ -105,6 +114,7 @@ char* AwsManager::generateClientID ()
   return cID;
 }
 
+/*---------------------------------------*/
 bool AwsManager::connect () 
 {
   if (this->_mqttClient == NULL) {
@@ -130,7 +140,6 @@ bool AwsManager::connect ()
   Serial.print (ESP.getFreeHeap ());
   Serial.println (")");
 
-
   int rc = _ipstack.connect(AWS_ENDPOINT, AWS_PORT);
   if (rc != 1)
   {
@@ -140,7 +149,6 @@ bool AwsManager::connect ()
   } else {
     Serial.println("websocket layer connected");
   }
-
 
   Serial.println("MQTT connecting");
   MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
@@ -159,6 +167,7 @@ bool AwsManager::connect ()
   return true;
 }
 
+/*---------------------------------------*/
 void AwsManager::subscribe () 
 {
   //subscript to a topic
@@ -172,6 +181,7 @@ void AwsManager::subscribe ()
   Serial.println("MQTT subscribed");
 }
 
+/*---------------------------------------*/
 void AwsManager::sendMessage () 
 {
   //send a message
