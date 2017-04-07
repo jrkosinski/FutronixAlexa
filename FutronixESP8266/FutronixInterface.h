@@ -6,16 +6,16 @@
 
 class FutronixInterface 
 {
+  private: 
+    IRManager _irManager; 
+    bool _enabled = false; 
+    
   public: 
     FutronixInterface(); 
 
     void begin(); 
     void test(); 
     void setScene(int scene); 
-
-  private: 
-    IRManager _irManager; 
-    bool _enabled = false; 
 };
 
 

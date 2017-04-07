@@ -7,6 +7,11 @@
 
 class IRManager
 {
+  private: 
+    int _pin; 
+    bool _enabled; 
+    int _halfPeriodicTime;
+
   public:
     IRManager();
     ~IRManager();
@@ -16,10 +21,6 @@ class IRManager
     void sendFutronix(unsigned long command); 
 
   private: 
-    int _pin; 
-    bool _enabled; 
-    int _halfPeriodicTime;
-
     void pinOn();
     void pinOff(); 
     void enableIROut(int khz);

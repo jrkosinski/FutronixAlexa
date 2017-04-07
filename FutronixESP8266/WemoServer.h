@@ -17,13 +17,6 @@ class IWemoCallbackHandler
 
 class WemoServer
 {
-  public:
-    WemoServer(char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler);
-    ~WemoServer();
-
-    void respondToSearch(IPAddress& senderIP, unsigned int senderPort);
-    void listen();
-
   private:
     char* _deviceName;
     int _localPort;
@@ -33,6 +26,14 @@ class WemoServer
     String _serial;
     ESP8266WebServer* _server = NULL;
     
+  public:
+    WemoServer(char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler);
+    ~WemoServer();
+
+    void respondToSearch(IPAddress& senderIP, unsigned int senderPort);
+    void listen();
+    
+  private:
     void startWebServer();
     void handleEventservice(); 
     void handleUpnpControl(); 

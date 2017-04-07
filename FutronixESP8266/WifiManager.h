@@ -13,19 +13,20 @@
 
 class WifiManager
 {
-  public:
-    WifiManager(char* ssid, char* password); 
-
-    bool isConnected; 
-
-    void begin(); 
-    bool connect(); 
-
   private: 
     ESP8266WiFiMulti _wiFiMulti;
     char* _wifiPasswd; 
     char* _wifiSsid; 
     bool _enabled = false; 
+
+  public:
+    bool isConnected; 
+    
+  public:
+    WifiManager(char* ssid, char* password); 
+
+    void begin(); 
+    bool connect(); 
 };
 
 WifiManager::WifiManager(char* ssid, char* password)

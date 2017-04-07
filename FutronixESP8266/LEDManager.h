@@ -6,6 +6,9 @@
 
 class LEDManager
 {
+  private: 
+    bool _enabled; 
+    
   public:
     LEDManager();
     
@@ -14,9 +17,6 @@ class LEDManager
     void ledOff(); 
     void blink(); 
     void blink(int);     
-
-  private: 
-    bool _enabled; 
 };
 
 

@@ -15,15 +15,6 @@ IPAddress _ipMulti(239, 255, 255, 250);
 
 class WemoEmulator
 {
-  public:
-    WemoEmulator();
-    ~WemoEmulator();
-
-    void begin();
-    void listen();
-    bool addDevice(char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler);
-    bool isRunning; 
-
   private:
     WemoServer* _servers[SERVER_COUNT_LIMIT];
     int _serverCount;
@@ -31,6 +22,17 @@ class WemoEmulator
     char _packetBuffer[512];
     WiFiUDP _udp;  
     bool _enabled = false; 
+    
+  public:
+    bool isRunning; 
+    
+  public:
+    WemoEmulator();
+    ~WemoEmulator();
+
+    void begin();
+    void listen();
+    bool addDevice(char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler);
 };
 
 WemoEmulator::WemoEmulator()

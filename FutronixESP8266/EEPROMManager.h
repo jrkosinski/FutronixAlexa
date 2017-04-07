@@ -8,6 +8,9 @@
 
 class EEPROMManager 
 {
+  private: 
+    bool _enabled = false; 
+    
   public: 
     EEPROMManager(); 
 
@@ -21,7 +24,6 @@ class EEPROMManager
     void clear(); 
 
   private: 
-    bool _enabled = false; 
     void doRead(char* buffer, int start, int len, bool stopOnNull, bool terminateString);
     void doWrite(char* buffer, int start, int len, bool stopOnNull, bool terminateString);
     void open(); 

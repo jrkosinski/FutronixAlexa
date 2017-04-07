@@ -31,6 +31,11 @@ int _arrivedCount = 0;
 
 class AwsManager
 {
+  private: 
+    bool _enabled = false; 
+    MQTT::Client<IPStack, Countdown, maxMQTTpackageSize, maxMQTTMessageHandlers>* _mqttClient = NULL;
+    long _connection = 0;
+
   public: 
     AwsManager(); 
 
@@ -38,10 +43,6 @@ class AwsManager
     void connectAndListen(); 
 
   private: 
-    bool _enabled = false; 
-    MQTT::Client<IPStack, Countdown, maxMQTTpackageSize, maxMQTTMessageHandlers>* _mqttClient = NULL;
-    long _connection = 0;
-
     char* generateClientID(); 
     bool connect(); 
     void subscribe(); 

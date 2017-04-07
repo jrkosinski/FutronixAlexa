@@ -6,14 +6,14 @@
 
 class SceneCallbackHandler : public IWemoCallbackHandler 
 {
+  private: 
+    int _sceneNo; 
+    FutronixInterface* _futronix; 
+    
   public: 
     SceneCallbackHandler(FutronixInterface* futronix, int sceneNo); 
 
     virtual void handleCallback(int param); 
-    
-  private: 
-    int _sceneNo; 
-    FutronixInterface* _futronix; 
 }; 
 
 
