@@ -3,30 +3,66 @@
 
 #include "FutronixInterface.h"
 #include "WemoEmulator.h"
+#include "DatabaseManager.h"
 
-class SceneCallbackHandler : public IWemoCallbackHandler 
+class SceneNumberCallbackHandler : public IWemoCallbackHandler 
 {
   private: 
     int _sceneNo; 
     FutronixInterface* _futronix; 
     
   public: 
-    SceneCallbackHandler(FutronixInterface* futronix, int sceneNo); 
+    SceneNumberCallbackHandler(FutronixInterface* futronix, int sceneNo); 
 
     virtual void handleCallback(int param); 
 }; 
 
 
-SceneCallbackHandler::SceneCallbackHandler(FutronixInterface* futronix, int sceneNo)
+class SceneNameCallbackHandler : public IWemoCallbackHandler 
+{
+  private: 
+    char* _sceneName; 
+    DatabaseManager* _dbManager; 
+    FutronixInterface* _futronix; 
+    
+  public: 
+    SceneNameCallbackHandler(FutronixInterface* futronix, DatabaseManager* dbManager, char* sceneName); 
+
+    virtual void handleCallback(int param); 
+}; 
+
+
+SceneNumberCallbackHandler::SceneNumberCallbackHandler(FutronixInterface* futronix, int sceneNo)
 {
   this->_sceneNo = sceneNo;
 }
 
-void SceneCallbackHandler::handleCallback(int param)
+void SceneNumberCallbackHandler::handleCallback(int param)
 {
   if (param)
   {
     this->_futronix->setScene(this->_sceneNo); 
+  }
+}
+
+
+SceneNameCallbackHandler::SceneNameCallbackHandler(FutronixInterface* futronix, DatabaseManager* dbManager, char* sceneName)
+{
+  this->_sceneName = _sceneName;
+  this->_dbManager = dbManager; 
+}
+
+void SceneNameCallbackHandler::handleCallback(int param)
+{
+  if (param)
+  {    
+    int sceneNo = -1; 
+    DatabaseRecord* record = this->_dbManager->getRecordByName(this->_sceneName); 
+    if (record != 0)
+    {
+      sceneNo = record->getSceneNumber(); 
+      this->_futronix->setScene(sceneNo); 
+    }
   }
 }
 
