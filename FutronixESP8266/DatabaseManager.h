@@ -28,12 +28,11 @@ class DatabaseRecord
       this->setData("");
     }
 
-    void setData(char* data)
+    void setData(const char* data)
     {
       int len = strlen(data);
       if (len > (RECORD_FIXED_SIZE-1))
       {
-        data[RECORD_FIXED_SIZE-1] = 0; 
         len = RECORD_FIXED_SIZE-1; 
       }
 
@@ -61,15 +60,42 @@ class DatabaseManager
     DatabaseManager(); 
 
     unsigned int getRecordCount(); 
-    
+
+    /***
+     * Reads a single record off of EEPROM.
+     */
     DatabaseRecord* getRecord(unsigned int recordIndex); 
-    DatabaseRecord* getRecordByName(char* name);
-    void setRecord(unsigned int recordIndex, char* data); 
+    
+    /***
+     * Finds a record in program memory, with the specified name, 
+     * or returns NULL if none found. 
+     */
+    DatabaseRecord* getRecordByName(const char* name);
+    
+    /***
+     * Writes a single record to EEPROM.
+     */
+    void setRecord(unsigned int recordIndex, const char* data); 
+
+    /***
+     * Retrieves entire contents of EEPROM DB, and returns a 
+     * pointer to its in-memory representation. 
+     */
     DatabaseRecord* getAllRecords(); 
 
     void begin(); 
+
+    /***
+     * Takes entire contents of records stored in program memory, and 
+     * writes it out to EEPROM. 
+     */
     void save();
-    void clear();
+
+    /***
+     * Clears EEPROM DB, but retains what's currently in program memory unless
+     * specified to clear it. 
+     */
+    void clear(bool clearProgramMemory);
     void test(); 
 };
 /****************************************/
@@ -85,6 +111,9 @@ DatabaseManager::DatabaseManager()
 /*---------------------------------------*/
 unsigned int DatabaseManager::getRecordCount()
 {
+  if (!this->_enabled)
+    return 0;
+    
   return MAX_SCENES; 
 }
 
@@ -101,25 +130,28 @@ DatabaseRecord* DatabaseManager::getRecord(unsigned int recordIndex)
 }
 
 /*---------------------------------------*/
-DatabaseRecord* DatabaseManager::getRecordByName(char* name)
+DatabaseRecord* DatabaseManager::getRecordByName(const char* name)
 {
-  for(int n=0; n<MAX_SCENES; n++)
+  if (this->_enabled)
   {
-    if (strcmp(this->_allRecords[n].getData(), name))
-      return &this->_allRecords[n];
+    for(int n=0; n<MAX_SCENES; n++)
+    {
+      if (strcmp(this->_allRecords[n].getData(), name))
+        return &this->_allRecords[n];
+    }
   }
-
-  return 0; 
+  
+  return NULL; 
 }
 
 /*---------------------------------------*/
-void DatabaseManager::setRecord(unsigned int recordIndex, char* data)
+void DatabaseManager::setRecord(unsigned int recordIndex, const char* data)
 {
+  if (!this->_enabled)
+    return;
+    
   if (recordIndex >= MAX_SCENES)
     recordIndex = (MAX_SCENES-1); 
-
-  if (strlen(data) > RECORD_FIXED_SIZE)
-    data[RECORD_FIXED_SIZE-1] = 0; 
     
   this->_allRecords[recordIndex].setData(data); 
   this->_eeprom.writeString(this->_allRecords[recordIndex].getData(), recordIndex); 
@@ -128,6 +160,9 @@ void DatabaseManager::setRecord(unsigned int recordIndex, char* data)
 /*---------------------------------------*/
 DatabaseRecord* DatabaseManager::getAllRecords()
 {
+  if (!this->_enabled)
+    return NULL;
+    
   int len = MAX_SCENES * RECORD_FIXED_SIZE;
   char buffer[len + 1]; 
   buffer[len+1] = 0; 
@@ -148,23 +183,37 @@ DatabaseRecord* DatabaseManager::getAllRecords()
 /*---------------------------------------*/
 void DatabaseManager::begin()
 {
-  Serial.println("DB: begin"); 
+  DEBUG_PRINTLN("DB: begin"); 
   this->_enabled = true; 
   this->_eeprom.begin();
   this->getAllRecords();
 }
 
 /*---------------------------------------*/
-void DatabaseManager::clear()
+void DatabaseManager::clear(bool clearProgramMemory)
 {
-  Serial.println("DB: Clearing"); 
+  if (!this->_enabled)
+    return;
+    
+  DEBUG_PRINTLN("DB: Clearing"); 
   this->_eeprom.clear();
+
+  if (clearProgramMemory)
+  {
+    for(int n=0; n<MAX_SCENES; n++)
+    {
+      this->_allRecords[n].setData(""); 
+    }
+  }
 }
 
 /*---------------------------------------*/
 void DatabaseManager::save()
 {
-  Serial.println("DB: Saving"); 
+  if (!this->_enabled)
+    return;
+    
+  DEBUG_PRINTLN("DB: Saving"); 
 
   int len = MAX_SCENES * RECORD_FIXED_SIZE;
   char buffer[len]; 
@@ -189,7 +238,7 @@ void DatabaseManager::test()
 
   char buffer[512]; 
   this->_eeprom.readAllString(buffer); 
-  Serial.println(buffer); 
+  DEBUG_PRINTLN(buffer); 
   delay(1000); 
 }
 

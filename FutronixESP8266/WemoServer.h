@@ -27,7 +27,7 @@ class IWemoCallbackHandler
 class WemoServer
 {
   private:
-    char* _deviceName;
+    const char* _deviceName;
     int _localPort;
     IWemoCallbackHandler* _callbackHandler;
     String _uuid;
@@ -36,11 +36,15 @@ class WemoServer
     ESP8266WebServer* _server = NULL;
     
   public:
-    WemoServer(char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler);
+    WemoServer(const char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler);
     ~WemoServer();
+
+    const char* getDeviceName() { return this->_deviceName;}
+    int getLocalPort() { return this->_localPort;}
 
     void respondToSearch(IPAddress& senderIP, unsigned int senderPort);
     void listen();
+    void stop();
     
   private:
     void startWebServer();
@@ -52,8 +56,8 @@ class WemoServer
 /****************************************/
 
 
-
-WemoServer::WemoServer(char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler)
+/*---------------------------------------*/
+WemoServer::WemoServer(const char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler)
 {
   this->_deviceName = deviceName;
   this->_localPort = localPort;
@@ -72,17 +76,20 @@ WemoServer::WemoServer(char* deviceName, int localPort, IWemoCallbackHandler* ca
   this->startWebServer(); 
 }
 
+/*---------------------------------------*/
 WemoServer::~WemoServer()
 {
   delete this->_callbackHandler;
 }
 
-void WemoServer::respondToSearch(IPAddress& senderIP, unsigned int senderPort) {
-  Serial.println("");
-  Serial.print("Sending response to ");
-  Serial.println(senderIP);
-  Serial.print("Port : ");
-  Serial.println(senderPort);
+/*---------------------------------------*/
+void WemoServer::respondToSearch(IPAddress& senderIP, unsigned int senderPort) 
+{
+  DEBUG_PRINTLN("");
+  DEBUG_PRINT("Sending response to ");
+  DEBUG_PRINTLN(senderIP);
+  DEBUG_PRINT("Port : ");
+  DEBUG_PRINTLN(senderPort);
 
   IPAddress localIP = WiFi.localIP();
   char s[16];
@@ -106,6 +113,7 @@ void WemoServer::respondToSearch(IPAddress& senderIP, unsigned int senderPort) {
   this->_udp.endPacket();
 }
 
+/*---------------------------------------*/
 void WemoServer::listen()
 {
   if (this->_server != NULL) {
@@ -114,6 +122,16 @@ void WemoServer::listen()
   }  
 }
 
+/*---------------------------------------*/
+void WemoServer::stop()
+{
+  if (this->_server != NULL) {
+    this->_server->close();
+    delay(1);
+  }  
+}
+
+/*---------------------------------------*/
 void WemoServer::startWebServer()
 {
   this->_server = new ESP8266WebServer(this->_localPort);
@@ -137,13 +155,14 @@ void WemoServer::startWebServer()
   //this->_server->onNotFound(handleNotFound);
   this->_server->begin();
 
-  Serial.println("WebServer started on port: ");
-  Serial.println(_localPort);
+  DEBUG_PRINTLN("WebServer started on port: ");
+  DEBUG_PRINTLN(_localPort);
 }
 
+/*---------------------------------------*/
 void WemoServer::handleEventservice()
 {
-  Serial.println(" ########## Responding to eventservice.xml ... ########\n");
+  DEBUG_PRINTLN(" ########## Responding to eventservice.xml ... ########\n");
 
   String eventServiceXml = "<?scpd xmlns=\"urn:Belkin:service-1-0\"?>"
         "<actionList>"
@@ -176,39 +195,43 @@ void WemoServer::handleEventservice()
   this->_server->send(200, "text/plain", eventServiceXml.c_str());
 }
 
-void WemoServer::handleUpnpControl(){
-  Serial.println("########## Responding to  /upnp/control/basicevent1 ... ##########");
+/*---------------------------------------*/
+void WemoServer::handleUpnpControl()
+{
+  DEBUG_PRINTLN("########## Responding to  /upnp/control/basicevent1 ... ##########");
 
   //for (int x=0; x <= HTTP.args(); x++) {
-  //  Serial.println(HTTP.arg(x));
+  //  DEBUG_PRINTLN(HTTP.arg(x));
   //}
 
   String request = this->_server->arg(0);
-  Serial.print("request:");
-  Serial.println(request);
+  DEBUG_PRINT("request:");
+  DEBUG_PRINTLN(request);
 
   if(request.indexOf("<BinaryState>1</BinaryState>") > 0) {
-      Serial.println("Got Turn on request");
+      DEBUG_PRINTLN("Got Turn on request");
       this->_callbackHandler->handleCallback(1);
   }
 
   if(request.indexOf("<BinaryState>0</BinaryState>") > 0) {
-      Serial.println("Got Turn off request");
+      DEBUG_PRINTLN("Got Turn off request");
       this->_callbackHandler->handleCallback(0);
   }
 
-  Serial.println("Responding to Control request");
+  DEBUG_PRINTLN("Responding to Control request");
   this->_server->send(200, "text/plain", "");
 }
 
+/*---------------------------------------*/
 void WemoServer::handleRoot()
 {
   this->_server->send(200, "text/plain", "You should tell Alexa to discover devices");
 }
 
+/*---------------------------------------*/
 void WemoServer::handleSetupXml()
 {
-  Serial.println(" ########## Responding to setup.xml ... ########\n");
+  DEBUG_PRINTLN(" ########## Responding to setup.xml ... ########\n");
 
   IPAddress localIP = WiFi.localIP();
   char s[16];
@@ -240,8 +263,8 @@ void WemoServer::handleSetupXml()
 
   this->_server->send(200, "text/xml", setupXml.c_str());
 
-  Serial.print("Sending :");
-  Serial.println(setupXml);
+  DEBUG_PRINT("Sending :");
+  DEBUG_PRINTLN(setupXml);
 }
 
 #endif

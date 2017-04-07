@@ -23,20 +23,23 @@ class EEPROMManager
     void readRaw(char* buffer, int len); 
     void readRaw(char* buffer, int start, int len); 
     void readAllRaw(char* buffer); 
+    
     void readString(char* buffer, int len); 
     void readString(char* buffer, int start, int len); 
     void readAllString(char* buffer); 
-    void write(char* buffer, int len);
-    void write(char* buffer, int start, int len);
-    void writeString(char* buffer); 
-    void writeString(char* buffer, int start); 
+    
+    void write(const char* buffer, int len);
+    void write(const char* buffer, int start, int len);
+    
+    void writeString(const char* buffer); 
+    void writeString(const char* buffer, int start); 
     void clear(); 
 
   private: 
-    void doRead(char* buffer, int start, int len, bool stopOnNull, bool terminateString);
-    void doWrite(char* buffer, int start, int len, bool stopOnNull, bool terminateString);
     void open(); 
     void close(); 
+    void doRead(char* buffer, int start, int len, bool stopOnNull, bool terminateString);
+    void doWrite(const char* buffer, int start, int len, bool stopOnNull, bool terminateString);
 };
 /****************************************/
 
@@ -116,27 +119,27 @@ void EEPROMManager::doRead(char* buffer, int start, int len, bool stopOnNull, bo
 }
 
 /*---------------------------------------*/
-void EEPROMManager::write(char* buffer, int len)
+void EEPROMManager::write(const char* buffer, int len)
 {
   this->doWrite(buffer, 0, len, false, (len < EEPROM_SIZE)); 
 }
 
 /*---------------------------------------*/
-void EEPROMManager::writeString(char* buffer)
+void EEPROMManager::writeString(const char* buffer)
 {
   int len = strlen(buffer);
   this->doWrite(buffer, 0, len, true, (len < EEPROM_SIZE)); 
 }
 
 /*---------------------------------------*/
-void EEPROMManager::writeString(char* buffer, int start)
+void EEPROMManager::writeString(const char* buffer, int start)
 {
   int len = strlen(buffer);
   this->doWrite(buffer, start, len, true, (len < EEPROM_SIZE)); 
 }
 
 /*---------------------------------------*/
-void EEPROMManager::doWrite(char* buffer, int start, int len, bool stopOnNull, bool terminateString)
+void EEPROMManager::doWrite(const char* buffer, int start, int len, bool stopOnNull, bool terminateString)
 {
   if (this->_enabled)
   {

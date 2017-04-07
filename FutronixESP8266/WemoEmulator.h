@@ -22,11 +22,11 @@ IPAddress _ipMulti(239, 255, 255, 250);
 class WemoEmulator
 {
   private:
+    WiFiUDP _udp;  
     WemoServer* _servers[SERVER_COUNT_LIMIT];
-    int _serverCount;
     const unsigned int _portMulti = 1900;
     char _packetBuffer[512];
-    WiFiUDP _udp;  
+    int _serverCount;
     bool _enabled = false; 
     
   public:
@@ -38,7 +38,10 @@ class WemoEmulator
 
     void begin();
     void listen();
-    bool addDevice(char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler);
+    void stop();
+    bool addDevice(const char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler);
+    bool replaceDevice(const char* deviceName, const char* newDeviceName, IWemoCallbackHandler* callbackHandler);
+    int getDeviceIndexByName(const char* deviceName);
 };
 /****************************************/
 
@@ -63,28 +66,31 @@ WemoEmulator::~WemoEmulator()
 void WemoEmulator::begin()
 {
   this->isRunning = false;
+  this->_enabled = true; 
   
-  Serial.println("Begin multicast ..");
+  DEBUG_PRINTLN("Begin multicast ..");
   
   if (this->_udp.beginMulticast(WiFi.localIP(), _ipMulti, this->_portMulti)) 
   {
-    Serial.print("Udp multicast server started at ");
-    Serial.print(_ipMulti);
-    Serial.print(":");
-    Serial.println(this->_portMulti);
+    DEBUG_PRINTLN("Udp multicast server started at ");
+    DEBUG_PRINTLN(_ipMulti);
+    DEBUG_PRINTLN(":");
+    DEBUG_PRINTLN(this->_portMulti);
 
     this->isRunning = true;
-    this->_enabled = true; 
   }
   else
   {
-    Serial.println("Connection failed");
+    DEBUG_PRINTLN("Connection failed");
   }
 }
 
 /*---------------------------------------*/
 void WemoEmulator::listen()
 {
+  if (!this->_enabled)
+    return; 
+    
   int packetSize = this->_udp.parsePacket();
   if (packetSize <= 0)
     return;
@@ -100,7 +106,7 @@ void WemoEmulator::listen()
 
   if (request.indexOf('M-SEARCH') > 0) {
     if (request.indexOf("urn:Belkin:device:**") > 0) {
-      Serial.println("Got UDP Belkin Request..");
+      DEBUG_PRINTLN("Got UDP Belkin Request..");
 
       for (int n = 0; n < this->_serverCount; n++) {
         WemoServer* server = _servers[n];
@@ -122,8 +128,26 @@ void WemoEmulator::listen()
 }
 
 /*---------------------------------------*/
-bool WemoEmulator::addDevice(char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler)
+void WemoEmulator::stop()
 {
+  if (!this->_enabled)
+    return; 
+    
+  for(int n = 0; n < this->_serverCount; n++) {
+    WemoServer* server = _servers[n];
+
+    if (server != NULL) {
+      server->stop();
+    }
+  }
+}
+
+/*---------------------------------------*/
+bool WemoEmulator::addDevice(const char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler)
+{
+  if (!this->_enabled)
+    return false; 
+    
   if (this->_serverCount < SERVER_COUNT_LIMIT)
   {
     this->_servers[this->_serverCount] = new WemoServer(deviceName, localPort, callbackHandler);
@@ -131,6 +155,47 @@ bool WemoEmulator::addDevice(char* deviceName, int localPort, IWemoCallbackHandl
   }
 
   return false;
+}
+
+/*---------------------------------------*/
+bool WemoEmulator::replaceDevice(const char* deviceName, const char* newDeviceName, IWemoCallbackHandler* callbackHandler)
+{
+  if (!this->_enabled)
+    return false; 
+    
+  int index = this->getDeviceIndexByName(deviceName); 
+  if (index >= 0)
+  {
+    WemoServer* server = this->_servers[index]; 
+    server->stop(); 
+
+    this->_servers[index] = new WemoServer(newDeviceName, server->getLocalPort(), callbackHandler); 
+    delete server;
+  }
+
+  return false;
+}
+
+/*---------------------------------------*/
+int WemoEmulator::getDeviceIndexByName(const char* deviceName)
+{
+  if (!this->_enabled)
+    return -1; 
+    
+  for(int n = 0; n < this->_serverCount; n++) 
+  {
+    WemoServer* server = _servers[n];
+
+    if (server != NULL)
+    {
+      if (strcmp(server->getDeviceName(), deviceName) == 0)
+      {
+        return n;
+      }
+    }
+  }
+  
+  return -1; 
 }
 
 #endif

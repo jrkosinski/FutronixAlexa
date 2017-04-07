@@ -40,13 +40,17 @@ void CommandInterface::begin()
 /*---------------------------------------*/
 void CommandInterface::test()
 {
-  this->_irManager.test(1);
+  if (this->_enabled)
+  {
+  }
 }
 
 /*---------------------------------------*/
 void CommandInterface::setScene(int scene)
 {
-  //this->_irManager->getSender()->sendFutronix(17); 
+  if (this->_enabled)
+  {
+  }
 }
 
 #endif

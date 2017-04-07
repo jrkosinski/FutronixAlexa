@@ -4,6 +4,7 @@
 
 #define IR_PIN              0
 #define FUTRONIX_INTERVAL   1560
+#define FUTRONIX_CMD_GAP    1620
 
 /****************************************
  * IRManager
@@ -87,8 +88,8 @@ IRManager::~IRManager()
 void IRManager::begin()
 {
   this->_enabled = true; 
-  Serial.print("Setting ir pin to OUTPUT - pin ");
-  Serial.println(IR_PIN); 
+  DEBUG_PRINTLN("Setting ir pin to OUTPUT - pin ");
+  DEBUG_PRINTLN(IR_PIN); 
   pinMode(IR_PIN, OUTPUT);
 }
 
@@ -97,7 +98,7 @@ void IRManager::test(int repeat)
 {
   for(int n=0; n<repeat; n++)
   {
-    Serial.println("testing"); 
+    DEBUG_PRINTLN("testing"); 
     this->mark(1000);
     this->pinOff(); 
     delay(4000); 
@@ -122,29 +123,63 @@ void IRManager::sendFutronix(unsigned long command)
         
         bool reverse = false;
         doSendFutronix(command, headerType, footerType, reverse, 700); 
+        delay(FUTRONIX_CMD_GAP); 
+        doSendFutronix(command, headerType, footerType, reverse, 700); 
         delay(2000); 
+        
+        doSendFutronix(command, headerType, footerType, reverse, 750); 
+        delay(FUTRONIX_CMD_GAP); 
         doSendFutronix(command, headerType, footerType, reverse, 750); 
         delay(2000); 
+        
+        doSendFutronix(command, headerType, footerType, reverse, 767); 
+        delay(FUTRONIX_CMD_GAP); 
         doSendFutronix(command, headerType, footerType, reverse, 767); 
         delay(2000); 
+        
+        doSendFutronix(command, headerType, footerType, reverse, 769); 
+        delay(FUTRONIX_CMD_GAP); 
         doSendFutronix(command, headerType, footerType, reverse, 769); 
         delay(2000); 
+        
+        doSendFutronix(command, headerType, footerType, reverse, 800); 
+        delay(FUTRONIX_CMD_GAP); 
         doSendFutronix(command, headerType, footerType, reverse, 800); 
         delay(2000); 
+        
+        doSendFutronix(command, headerType, footerType, reverse, 900); 
+        delay(FUTRONIX_CMD_GAP); 
         doSendFutronix(command, headerType, footerType, reverse, 900); 
         delay(2000); 
         
         reverse = true;
         doSendFutronix(command, headerType, footerType, reverse, 700); 
+        delay(FUTRONIX_CMD_GAP); 
+        doSendFutronix(command, headerType, footerType, reverse, 700); 
         delay(2000); 
+        
+        doSendFutronix(command, headerType, footerType, reverse, 750); 
+        delay(FUTRONIX_CMD_GAP); 
         doSendFutronix(command, headerType, footerType, reverse, 750); 
         delay(2000); 
+        
+        doSendFutronix(command, headerType, footerType, reverse, 767); 
+        delay(FUTRONIX_CMD_GAP); 
         doSendFutronix(command, headerType, footerType, reverse, 767); 
         delay(2000); 
+        
+        doSendFutronix(command, headerType, footerType, reverse, 769); 
+        delay(FUTRONIX_CMD_GAP); 
         doSendFutronix(command, headerType, footerType, reverse, 769); 
         delay(2000); 
+        
+        doSendFutronix(command, headerType, footerType, reverse, 800); 
+        delay(FUTRONIX_CMD_GAP); 
         doSendFutronix(command, headerType, footerType, reverse, 800); 
         delay(2000); 
+        
+        doSendFutronix(command, headerType, footerType, reverse, 900); 
+        delay(FUTRONIX_CMD_GAP); 
         doSendFutronix(command, headerType, footerType, reverse, 900); 
         delay(2000); 
       }
@@ -165,7 +200,7 @@ void IRManager::mark(unsigned int usec)
     this->pinOff();
     // e.g. 38 kHz -> T = 26.31 microsec (periodic time), half of it is 13
     delayMicroseconds(_halfPeriodicTime);
-    Serial.println("one cycle");
+    DEBUG_PRINTLN("one cycle");
   }
 }
 
@@ -214,12 +249,12 @@ void IRManager::doSendFutronix(unsigned long command, int headerType, int footer
   // Set IR carrier frequency
   enableIROut(38);
   
-  Serial.print("Setting scene "); //, bitmark %d, headerType %d, footerType %d", bitmark, headerType, footerType); 
-  Serial.println(bitmark); 
+  DEBUG_PRINTLN("Setting scene "); //, bitmark %d, headerType %d, footerType %d", bitmark, headerType, footerType); 
+  DEBUG_PRINTLN(bitmark); 
   
   //header
   #ifdef __DEBUG_PRINT__
-  Serial.println("\nheader:"); 
+  DEBUG_PRINTLN("\nheader:"); 
   #endif
   switch(headerType)
   {
@@ -321,7 +356,7 @@ void IRManager::doSendFutronix(unsigned long command, int headerType, int footer
   /*
   //body
   #ifdef __DEBUG_PRINT__
-  Serial.println("\nbody:"); 
+  DEBUG_PRINTLN("\nbody:"); 
   #endif
   int onesCount = 0; 
   int bitPosition = 1; 
@@ -347,7 +382,7 @@ void IRManager::doSendFutronix(unsigned long command, int headerType, int footer
   
   //parity bit
   #ifdef __DEBUG_PRINT__
-  Serial.println("\nparity:"); 
+  DEBUG_PRINTLN("\nparity:"); 
   #endif
   if (onesCount %2 == 0) {
       mark(FUTRONIX_BITMARK);
@@ -361,7 +396,7 @@ void IRManager::doSendFutronix(unsigned long command, int headerType, int footer
   
   //footer
   #ifdef __DEBUG_PRINT__
-  Serial.println("\nfooter:"); 
+  DEBUG_PRINTLN("\nfooter:"); 
   #endif
   
   switch(footerType)
@@ -383,7 +418,7 @@ void IRManager::doSendFutronix(unsigned long command, int headerType, int footer
   }
   this->pinOff();
   
-  Serial.println("------------------");
+  DEBUG_PRINTLN("------------------");
 }
 
 #endif

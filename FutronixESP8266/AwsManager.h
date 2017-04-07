@@ -32,6 +32,7 @@ int _arrivedCount = 0;
 /****************************************
  * AwsManager
  * ----------
+ * Interface to AWS SDK. 
  */
 class AwsManager
 {
@@ -60,20 +61,20 @@ void onMessageArrivedCallback(MQTT::MessageData& md)
 {
   MQTT::Message &message = md.message;
 
-  Serial.print("Message ");
-  Serial.print(++_arrivedCount);
-  Serial.print(" arrived: qos ");
-  Serial.print(message.qos);
-  Serial.print(", retained ");
-  Serial.print(message.retained);
-  Serial.print(", dup ");
-  Serial.print(message.dup);
-  Serial.print(", packetid ");
-  Serial.println(message.id);
-  Serial.print("Payload ");
+  DEBUG_PRINT("Message ");
+  DEBUG_PRINT(++_arrivedCount);
+  DEBUG_PRINT(" arrived: qos ");
+  DEBUG_PRINT(message.qos);
+  DEBUG_PRINT(", retained ");
+  DEBUG_PRINT(message.retained);
+  DEBUG_PRINT(", dup ");
+  DEBUG_PRINT(message.dup);
+  DEBUG_PRINT(", packetid ");
+  DEBUG_PRINTLN(message.id);
+  DEBUG_PRINT("Payload ");
   char* msg = new char[message.payloadlen+1]();
   memcpy (msg,message.payload,message.payloadlen);
-  Serial.println(msg);
+  DEBUG_PRINTLN(msg);
   delete msg;
 }
 
@@ -123,7 +124,7 @@ bool AwsManager::connect ()
   else 
   {
     if (this->_mqttClient->isConnected ()) {    
-      Serial.println("Connected already; disconnecting..."); 
+      DEBUG_PRINTLN("Connected already; disconnecting..."); 
       this->_mqttClient->disconnect ();
   }  
       
@@ -133,24 +134,24 @@ bool AwsManager::connect ()
 
   //delay is not necessary... it just help us to get a "trustful" heap space value
   delay (1000);
-  Serial.print (millis ());
-  Serial.print (" - conn: ");
-  Serial.print (++_connection);
-  Serial.print (" - (");
-  Serial.print (ESP.getFreeHeap ());
-  Serial.println (")");
+  DEBUG_PRINTLN (millis ());
+  DEBUG_PRINTLN (" - conn: ");
+  DEBUG_PRINTLN (++_connection);
+  DEBUG_PRINTLN (" - (");
+  DEBUG_PRINTLN (ESP.getFreeHeap ());
+  DEBUG_PRINTLN (")");
 
   int rc = _ipstack.connect(AWS_ENDPOINT, AWS_PORT);
   if (rc != 1)
   {
-    Serial.println("error connection to the websocket server");
-    Serial.println(rc);
+    DEBUG_PRINTLN("error connection to the websocket server");
+    DEBUG_PRINTLN(rc);
     return false;
   } else {
-    Serial.println("websocket layer connected");
+    DEBUG_PRINTLN("websocket layer connected");
   }
 
-  Serial.println("MQTT connecting");
+  DEBUG_PRINTLN("MQTT connecting");
   MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
   data.MQTTVersion = 3;
 
@@ -159,11 +160,11 @@ bool AwsManager::connect ()
   rc = _mqttClient->connect(data);
   delete[] clientID;
   if (rc != 0) {
-    Serial.print("error connection to MQTT server");
-    Serial.println(rc);
+    DEBUG_PRINTLN("error connection to MQTT server");
+    DEBUG_PRINTLN(rc);
     return false;
   }
-  Serial.println("MQTT connected");
+  DEBUG_PRINTLN("MQTT connected");
   return true;
 }
 
@@ -173,12 +174,12 @@ void AwsManager::subscribe ()
   //subscript to a topic
   int rc = _mqttClient->subscribe(AWS_TOPIC, MQTT::QOS0, onMessageArrivedCallback);
   if (rc != 0) {
-    Serial.print("rc from MQTT subscribe is ");
-    Serial.println(rc);
+    DEBUG_PRINTLN("rc from MQTT subscribe is ");
+    DEBUG_PRINTLN(rc);
     return;
   }
 
-  Serial.println("MQTT subscribed");
+  DEBUG_PRINTLN("MQTT subscribed");
 }
 
 /*---------------------------------------*/

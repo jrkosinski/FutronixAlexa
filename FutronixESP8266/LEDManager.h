@@ -68,10 +68,10 @@ void LEDManager::blink(int times)
 {
   for(int i=0; i<times; i++)
   {
-    this->ledOff(); 
-    delay(500); 
     this->ledOn(); 
-    delay(500); 
+    delay(100); 
+    this->ledOff(); 
+    delay(300); 
   }
 }
 

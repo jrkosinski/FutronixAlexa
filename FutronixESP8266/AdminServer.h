@@ -9,6 +9,8 @@
 /****************************************
  * AdminServer
  * -----------
+ * Web server that runs to receive commands from any client, for the purpose 
+ * of admin tasks like monitoring or managing scene names. 
  */
 class AdminServer
 {
@@ -32,6 +34,7 @@ class AdminServer
 };
 /****************************************/
 
+/*---------------------------------------*/
 AdminServer::AdminServer()
 {
   
@@ -68,8 +71,7 @@ void AdminServer::begin()
 
   this->_server->begin();
 
-  Serial.println("AdminServer started on port: ");
-  Serial.println(_localPort);
+  DEBUG_PRINTLN(String("AdminServer started on port: ") + _localPort);
 }
 
 /*---------------------------------------*/

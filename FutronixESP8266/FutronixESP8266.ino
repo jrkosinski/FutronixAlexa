@@ -17,6 +17,7 @@
 
 #include <Arduino.h>
 
+#include "debug.h"
 #include "LEDManager.h"
 #include "IRManager.h"
 #include "WifiManager.h"
@@ -34,11 +35,23 @@
 class FutronixESP8266
 {
   private:
+    /* controls the LED light */
     LEDManager _ledManager;
+
+    /* interface to Futronix chip  */
     CommandInterface _command;
+
+    /* interface to Wifi connection */
     WifiManager _wifiManager;
+
+    /* WEMO emulation  */
     WemoEmulator _wemoEmulator;
+
+    /* on-chip database */
     DatabaseManager _dbManager; 
+
+    /* last set scene */
+    int _currentScene = -1; 
 
   public: 
     FutronixESP8266();
@@ -46,11 +59,34 @@ class FutronixESP8266
     void begin();
     void loop();
 
+    /***
+     * gets entire contens of scene-names DB
+     */
     DatabaseRecord* getAllSceneNames(); 
+
+    /***
+     * clears EEPROM DB of scene names 
+     */
     void clearSceneNames();
-    void renameScene(int sceneNo, char* sceneName); 
+
+    /***
+     * renames the specified scene with given name 
+     */
+    void renameScene(int sceneNo, const char* sceneName); 
+
+    /***
+     * sets a scene on the Futronix chip 
+     */
     void setScene(int sceneNo); 
+
+    /***
+     * gets the last-set scene 
+     */
     int getCurrentScene();
+
+    /***
+     * restart wemo servers, or start them if not yet running
+     */
     void restartWemoServers();    
 
   private:
@@ -107,6 +143,43 @@ void FutronixESP8266::loop()
 }
 
 /*---------------------------------------*/
+DatabaseRecord* FutronixESP8266::getAllSceneNames()
+{
+  return this->_dbManager.getAllRecords();
+}
+
+/*---------------------------------------*/
+void FutronixESP8266::clearSceneNames()
+{
+  this->_dbManager.clear(false);
+}
+
+/*---------------------------------------*/
+void FutronixESP8266::renameScene(int sceneNo, const char* sceneName)
+{
+  this->_dbManager.setRecord(sceneNo, sceneName);
+} 
+
+/*---------------------------------------*/
+void FutronixESP8266::setScene(int sceneNo)
+{
+  this->_command.setScene(sceneNo);
+  this->_currentScene = sceneNo;
+} 
+
+/*---------------------------------------*/
+int FutronixESP8266::getCurrentScene()
+{
+  return this->_currentScene;
+}
+
+/*---------------------------------------*/
+void FutronixESP8266::restartWemoServers()
+{
+  
+}    
+
+/*---------------------------------------*/
 void FutronixESP8266::startWemoServers()
 {
   int baseNumberPort = 80; 
@@ -127,7 +200,8 @@ void FutronixESP8266::startWemoServers()
     this->_wemoEmulator.addDevice(buffer, baseNumberPort+n, new SceneNumberCallbackHandler(&this->_command, n));
 
     //scene names 
-    this->_wemoEmulator.addDevice(buffer, baseNamePort+n, new SceneNameCallbackHandler(&this->_command, &this->_dbManager, records[n].getData())); 
+    if (strlen(records[n].getData()) > 0)
+      this->_wemoEmulator.addDevice(buffer, baseNamePort+n, new SceneNameCallbackHandler(&this->_command, &this->_dbManager, records[n].getData())); 
   }
 }
 

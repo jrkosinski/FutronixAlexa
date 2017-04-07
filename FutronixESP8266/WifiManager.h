@@ -55,12 +55,12 @@ bool WifiManager::connect()
 {
   this->_wiFiMulti.addAP(this->_wifiSsid, this->_wifiPasswd);
     
-  Serial.println ("connecting to wifi");
+  DEBUG_PRINTLN ("connecting to wifi");
   while(this->_wiFiMulti.run() != WL_CONNECTED) {
     delay(100);
-    Serial.print (".");
+    DEBUG_PRINT (".");
   }
-  Serial.println ("\nconnected");
+  DEBUG_PRINTLN ("\nconnected");
 
   this->isConnected = true; 
   return true;
