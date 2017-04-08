@@ -37,7 +37,7 @@ class DatabaseRecord
       }
 
       memcpy(this->_data, data, len);
-      this->_data[len+1] = 0; 
+      this->_data[len] = 0; 
     }
     
     char* getData() { return this->_data; }
@@ -120,13 +120,18 @@ unsigned int Database::getRecordCount()
 /*---------------------------------------*/
 DatabaseRecord* Database::getRecord(unsigned int recordIndex)
 {
-  if (recordIndex >= MAX_SCENES)
-    recordIndex = (MAX_SCENES-1); 
-
-  char buffer[RECORD_FIXED_SIZE];
-  this->_eeprom.readRaw(buffer, (recordIndex * RECORD_FIXED_SIZE), RECORD_FIXED_SIZE); 
-  this->_allRecords[recordIndex].setData(buffer); 
-  return &(this->_allRecords[recordIndex]); 
+  if (this->_enabled)
+  {
+    DEBUG_PRINTLN(String("Database:test ") + String(recordIndex)); 
+    
+    if (recordIndex >= MAX_SCENES)
+      recordIndex = (MAX_SCENES-1); 
+  
+    char buffer[RECORD_FIXED_SIZE];
+    this->_eeprom.readRaw(buffer, (recordIndex * RECORD_FIXED_SIZE), RECORD_FIXED_SIZE); 
+    this->_allRecords[recordIndex].setData(buffer); 
+    return &(this->_allRecords[recordIndex]); 
+  }
 }
 
 /*---------------------------------------*/
@@ -134,6 +139,8 @@ DatabaseRecord* Database::getRecordByName(const char* name)
 {
   if (this->_enabled)
   {
+    DEBUG_PRINTLN(String("Database:getRecordByName ") + name); 
+    
     for(int n=0; n<MAX_SCENES; n++)
     {
       if (strcmp(this->_allRecords[n].getData(), name))
@@ -150,11 +157,13 @@ void Database::setRecord(unsigned int recordIndex, const char* data)
   if (!this->_enabled)
     return;
     
+  DEBUG_PRINTLN(String("Database:setRecord ") + String(recordIndex) + " " + data); 
+  
   if (recordIndex >= MAX_SCENES)
     recordIndex = (MAX_SCENES-1); 
     
   this->_allRecords[recordIndex].setData(data); 
-  this->_eeprom.writeString(this->_allRecords[recordIndex].getData(), recordIndex); 
+  this->_eeprom.writeString(this->_allRecords[recordIndex].getData(), recordIndex * RECORD_FIXED_SIZE); 
 }
 
 /*---------------------------------------*/
@@ -163,6 +172,8 @@ DatabaseRecord* Database::getAllRecords()
   if (!this->_enabled)
     return NULL;
     
+  DEBUG_PRINTLN("Database:getAllRecords"); 
+  
   int len = MAX_SCENES * RECORD_FIXED_SIZE;
   char buffer[len + 1]; 
   buffer[len+1] = 0; 
@@ -173,8 +184,10 @@ DatabaseRecord* Database::getAllRecords()
   for(int n=0; n<MAX_SCENES; n++)
   {
     this->_allRecords[n].Index = n; 
-    pBuf += (RECORD_FIXED_SIZE * sizeof(char)); 
     this->_allRecords[n].setData(pBuf); 
+    pBuf += (RECORD_FIXED_SIZE * sizeof(char)); 
+    
+    DEBUG_PRINTLN(String(this->_allRecords[n].Index) + ":" + this->_allRecords[n].getData()); 
   }
   
   return this->_allRecords; 
@@ -183,7 +196,8 @@ DatabaseRecord* Database::getAllRecords()
 /*---------------------------------------*/
 void Database::begin()
 {
-  DEBUG_PRINTLN("DB: begin"); 
+  DEBUG_PRINTLN("Database:begin"); 
+  
   this->_enabled = true; 
   this->_eeprom.begin();
   this->getAllRecords();
@@ -195,7 +209,8 @@ void Database::clear(bool clearProgramMemory)
   if (!this->_enabled)
     return;
     
-  DEBUG_PRINTLN("DB: Clearing"); 
+  DEBUG_PRINTLN("Database:clear");  
+  
   this->_eeprom.clear();
 
   if (clearProgramMemory)

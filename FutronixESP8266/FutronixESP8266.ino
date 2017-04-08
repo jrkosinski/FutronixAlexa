@@ -30,12 +30,14 @@ void setup()
   Serial.begin(9600);
 
   futronix.begin();
+  //adminServer.begin();
 }
 
 /*---------------------------------------*/
 void loop()
 {
   futronix.loop();
+  //adminServer.listen();
 }
 
 

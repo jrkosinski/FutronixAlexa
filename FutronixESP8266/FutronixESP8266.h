@@ -30,7 +30,7 @@ class FutronixESP8266
     WifiConnection* _wifi;
 
     /* WEMO emulation  */
-    WemoEmulator* _wemoEmulator;
+    WemoEmulator* _wemo;
 
     /* on-chip database */
     Database* _db; 
@@ -86,49 +86,55 @@ FutronixESP8266::FutronixESP8266()
   this->_led = new LEDOutput();
   this->_command = new CommandInterface(); 
   this->_wifi = new WifiConnection(); 
-  this->_wemoEmulator = new WemoEmulator(); 
+  this->_wemo = new WemoEmulator(); 
   this->_db = new Database();
 }
 
 /*---------------------------------------*/
 void FutronixESP8266::begin()
 {
-  //this->_led->begin();
-  //this->_wifi->begin();
-  //this->_command->begin();
+  DEBUG_PRINTLN("Futronix:begin"); 
+  
+  this->_led->begin();
+  this->_wifi->begin();
+  this->_command->begin();
   this->_db->begin(); 
 
-/*
-  if (this->_wifi.connect())
-  {
-    this->_wemoEmulator.begin();
+  this->_db->setRecord(0, "red");
+  this->_db->setRecord(2, "blue");
+  this->_db->getAllRecords();
 
-    this->startWemoServers();
+  if (this->_wifi->connect())
+  {
+  //  this->_wemo->begin();
+  //  this->startWemoServers();
   }
-  */
 }
 
 /*---------------------------------------*/
 void FutronixESP8266::loop()
 {
-  
+  //this->_wemo->listen();
 }
 
 /*---------------------------------------*/
 DatabaseRecord* FutronixESP8266::getAllSceneNames()
 {
+  DEBUG_PRINTLN("Futronix:getAllSceneNames"); 
   return this->_db->getAllRecords();
 }
 
 /*---------------------------------------*/
 void FutronixESP8266::clearSceneNames()
 {
+  DEBUG_PRINTLN("Futronix:clearSceneNames"); 
   this->_db->clear(false);
 }
 
 /*---------------------------------------*/
 void FutronixESP8266::renameScene(int sceneNo, const char* sceneName)
 {
+  DEBUG_PRINTLN(String("Futronix:renameScene ") + String(sceneNo) + " to " + sceneName); 
   this->_db->setRecord(sceneNo, sceneName);
 
   //TODO: restart web server 
@@ -137,6 +143,7 @@ void FutronixESP8266::renameScene(int sceneNo, const char* sceneName)
 /*---------------------------------------*/
 void FutronixESP8266::setScene(int sceneNo)
 {
+  DEBUG_PRINTLN(String("Futronix:setScene ") + String(sceneNo)); 
   this->_command->setScene(sceneNo);
   this->_currentScene = sceneNo;
 } 
@@ -150,12 +157,14 @@ int FutronixESP8266::getCurrentScene()
 /*---------------------------------------*/
 void FutronixESP8266::restartWemoServers()
 {
-  
+  DEBUG_PRINTLN("Futronix:restartWemoServers"); 
 }    
 
 /*---------------------------------------*/
 void FutronixESP8266::startWemoServers()
 {
+  DEBUG_PRINTLN("Futronix:startWemoServers"); 
+  
   int baseNumberPort = 80; 
   int baseNamePort = baseNumberPort + this->_db->getRecordCount(); 
 
@@ -171,11 +180,11 @@ void FutronixESP8266::startWemoServers()
     itoa((n+1), pBuf+strlen(buffer), 10); 
 
     //scene numbers 
-    this->_wemoEmulator->addDevice(buffer, baseNumberPort+n, new SceneNumberCallbackHandler(this->_command, n));
+    this->_wemo->addDevice(buffer, baseNumberPort+n, new SceneNumberCallbackHandler(this->_command, n));
 
     //scene names 
     if (strlen(records[n].getData()) > 0)
-      this->_wemoEmulator->addDevice(buffer, baseNamePort+n, new SceneNameCallbackHandler(this->_command, this->_db, records[n].getData())); 
+      this->_wemo->addDevice(buffer, baseNamePort+n, new SceneNameCallbackHandler(this->_command, this->_db, records[n].getData())); 
   }
 }
 

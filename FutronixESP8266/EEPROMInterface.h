@@ -6,6 +6,8 @@
 
 #define EEPROM_SIZE 4096
 
+//TODO: synchronize access to a single thread (is it necessary?) 
+
 /****************************************
  * EEPROMInterface
  * ---------------
@@ -96,6 +98,8 @@ void EEPROMInterface::doRead(char* buffer, int start, int len, bool stopOnNull, 
 {
   if (this->_enabled)
   {
+    DEBUG_PRINTLN(String("EEPROM:doRead start:") + start + " len:" + len); 
+    
     this->open();
     
     if (len > EEPROM_SIZE)
@@ -103,17 +107,21 @@ void EEPROMInterface::doRead(char* buffer, int start, int len, bool stopOnNull, 
 
     if (terminateString)
     {
-      if (len > EEPROM_SIZE)
+      if (len < EEPROM_SIZE)
         buffer[len] = 0; 
     }
   
+    //DEBUG_PRINTLN(String("readlen is ") + len); 
     for(int n=0; n<len; n++)
     {
-      buffer[n] = EEPROM.read(n); 
+      buffer[n] = EEPROM.read(n+start); 
+      //DEBUG_PRINTLN(String("reading ") + String((int)buffer[n]) + " at " + String(n+start) + " - " + buffer[n]); 
+      //delay(10); 
       if (stopOnNull && buffer[n] == 0)
         break;
     }
     
+    delay(100); 
     this->close();
   }
 }
@@ -143,17 +151,31 @@ void EEPROMInterface::doWrite(const char* buffer, int start, int len, bool stopO
 {
   if (this->_enabled)
   {
+    DEBUG_PRINTLN(String("EEPROM:doWrite ") + buffer + " start:" + start + " len:" + len); 
     this->open();
-    
+
+    bool nullTerminated = false;
     if (len > EEPROM_SIZE)
       len = EEPROM_SIZE; 
 
+    int dbIndex = 0; 
     for(int n=0; n<len; n++)
     {
-      EEPROM.write(n, buffer[n]); 
+      dbIndex = (n+start);
+      EEPROM.write(dbIndex, buffer[n]); 
+      //DEBUG_PRINTLN(String("writing ") + String((int)buffer[n]) + " - " + buffer[n]); 
 
       if (stopOnNull && buffer[n] == 0)
+      {
+        nullTerminated = true;
         break;
+      }
+    }
+
+    if (terminateString && !nullTerminated)
+    {
+      //DEBUG_PRINTLN("writing null terminator"); 
+      EEPROM.write(dbIndex+1, 0); 
     }
     
     this->close();
@@ -171,7 +193,7 @@ void EEPROMInterface::clear()
     {
       EEPROM.write(n, 0); 
     }
-    
+
     this->close();
   }
 }

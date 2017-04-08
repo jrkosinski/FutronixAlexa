@@ -2,8 +2,8 @@
 #ifndef __WIFI_CONNECTION_H__
 #define __WIFI_CONNECTION_H__
 
-#define WIFI_SSID "Mina";
-#define WIFI_PASSWD "HappyTime";
+#define WIFI_SSID     "mina"
+#define WIFI_PASSWD   "HappyTime"
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
@@ -48,12 +48,14 @@ WifiConnection::WifiConnection()
 /*---------------------------------------*/
 void WifiConnection::begin()
 {
+  DEBUG_PRINTLN("Wifi:begin"); 
   this->_enabled = true; 
 }
 
 /*---------------------------------------*/
 bool WifiConnection::connect()
 {
+  DEBUG_PRINTLN(String("Wifi:connect ") + this->_wifiSsid + " / " + this->_wifiPasswd); 
   this->_wiFiMulti.addAP(this->_wifiSsid, this->_wifiPasswd);
     
   DEBUG_PRINTLN ("connecting to wifi");

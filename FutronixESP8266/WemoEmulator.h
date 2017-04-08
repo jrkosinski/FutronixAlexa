@@ -68,7 +68,7 @@ void WemoEmulator::begin()
   this->isRunning = false;
   this->_enabled = true; 
   
-  DEBUG_PRINTLN("Begin multicast ..");
+  DEBUG_PRINTLN("WemoEmulator:begin");
   
   if (this->_udp.beginMulticast(WiFi.localIP(), _ipMulti, this->_portMulti)) 
   {
@@ -91,6 +91,8 @@ void WemoEmulator::listen()
   if (!this->_enabled)
     return; 
     
+  DEBUG_PRINTLN("WemoEmulator:listen");
+  
   int packetSize = this->_udp.parsePacket();
   if (packetSize <= 0)
     return;
@@ -133,6 +135,8 @@ void WemoEmulator::stop()
   if (!this->_enabled)
     return; 
     
+  DEBUG_PRINTLN("WemoEmulator:stop");
+    
   for(int n = 0; n < this->_serverCount; n++) {
     WemoServer* server = _servers[n];
 
@@ -148,6 +152,8 @@ bool WemoEmulator::addDevice(const char* deviceName, int localPort, IWemoCallbac
   if (!this->_enabled)
     return false; 
     
+  DEBUG_PRINTLN(String("WemoEmulator:addDevice ") + deviceName + " port:" + String(localPort));
+  
   if (this->_serverCount < SERVER_COUNT_LIMIT)
   {
     this->_servers[this->_serverCount] = new WemoServer(deviceName, localPort, callbackHandler);
@@ -162,6 +168,8 @@ bool WemoEmulator::replaceDevice(const char* deviceName, const char* newDeviceNa
 {
   if (!this->_enabled)
     return false; 
+    
+  DEBUG_PRINTLN(String("WemoEmulator:replaceDevice ") + deviceName + " to:" + newDeviceName);
     
   int index = this->getDeviceIndexByName(deviceName); 
   if (index >= 0)

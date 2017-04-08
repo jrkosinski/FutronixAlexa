@@ -33,6 +33,7 @@ CommandInterface::CommandInterface()
 /*---------------------------------------*/
 void CommandInterface::begin()
 {
+  DEBUG_PRINTLN("CommandInterface:begin"); 
   this->_enabled = true; 
   this->_irTransmitter.begin();
 }
@@ -42,6 +43,7 @@ void CommandInterface::test()
 {
   if (this->_enabled)
   {
+    DEBUG_PRINTLN("CommandInterface:test"); 
   }
 }
 
@@ -50,6 +52,7 @@ void CommandInterface::setScene(int scene)
 {
   if (this->_enabled)
   {
+    DEBUG_PRINTLN(String("CommandInterface:setScene ") + String(scene)); 
   }
 }
 
