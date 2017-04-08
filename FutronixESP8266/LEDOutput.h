@@ -1,21 +1,21 @@
 
-#ifndef __LED_MANAGER_H__
-#define __LED_MANAGER_H__
+#ifndef __LED_OUTPUT_H__
+#define __LED_OUTPUT_H__
 
 #define   LED_PIN   2
 
 /****************************************
- * LEDManager
- * ----------
+ * LEDOutput
+ * ---------
  * Controls the LED light on pin 2. 
  */
-class LEDManager
+class LEDOutput
 {
   private: 
     bool _enabled; 
     
   public:
-    LEDManager();
+    LEDOutput();
     
     void begin(); 
     void ledOn(); 
@@ -27,20 +27,20 @@ class LEDManager
 
 
 /*---------------------------------------*/
-LEDManager::LEDManager()
+LEDOutput::LEDOutput()
 {
   this->_enabled = false;
 }
 
 /*---------------------------------------*/
-void LEDManager::begin()
+void LEDOutput::begin()
 {
   pinMode(LED_PIN, OUTPUT); 
   this->_enabled = true;
 }
 
 /*---------------------------------------*/
-void LEDManager::ledOn()
+void LEDOutput::ledOn()
 {
   if (this->_enabled)
   {
@@ -49,7 +49,7 @@ void LEDManager::ledOn()
 }
 
 /*---------------------------------------*/
-void LEDManager::ledOff()
+void LEDOutput::ledOff()
 {
   if (this->_enabled)
   {
@@ -58,13 +58,13 @@ void LEDManager::ledOff()
 }
 
 /*---------------------------------------*/
-void LEDManager::blink()
+void LEDOutput::blink()
 {
   this->blink(1); 
 }
 
 /*---------------------------------------*/
-void LEDManager::blink(int times)
+void LEDOutput::blink(int times)
 {
   for(int i=0; i<times; i++)
   {

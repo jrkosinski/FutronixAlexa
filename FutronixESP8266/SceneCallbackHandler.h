@@ -3,7 +3,7 @@
 
 #include "CommandInterface.h"
 #include "WemoEmulator.h"
-#include "DatabaseManager.h"
+#include "Database.h"
 
 /****************************************
  * SceneNumberCallbackHandler
@@ -30,11 +30,11 @@ class SceneNameCallbackHandler : public IWemoCallbackHandler
 {
   private: 
     char* _sceneName; 
-    DatabaseManager* _dbManager; 
+    Database* _db; 
     CommandInterface* _command; 
     
   public: 
-    SceneNameCallbackHandler(CommandInterface* command, DatabaseManager* dbManager, char* sceneName); 
+    SceneNameCallbackHandler(CommandInterface* command, Database* dbManager, char* sceneName); 
 
     virtual void handleCallback(int param); 
 }; 
@@ -58,10 +58,10 @@ void SceneNumberCallbackHandler::handleCallback(int param)
 }
 
 /*---------------------------------------*/
-SceneNameCallbackHandler::SceneNameCallbackHandler(CommandInterface* command, DatabaseManager* dbManager, char* sceneName)
+SceneNameCallbackHandler::SceneNameCallbackHandler(CommandInterface* command, Database* dbManager, char* sceneName)
 {
   this->_sceneName = _sceneName;
-  this->_dbManager = dbManager; 
+  this->_db = dbManager; 
   this->_command = command; 
 }
 
@@ -71,7 +71,7 @@ void SceneNameCallbackHandler::handleCallback(int param)
   if (param)
   {    
     int sceneNo = -1; 
-    DatabaseRecord* record = this->_dbManager->getRecordByName(this->_sceneName); 
+    DatabaseRecord* record = this->_db->getRecordByName(this->_sceneName); 
     if (record != 0)
     {
       sceneNo = record->getSceneNumber(); 

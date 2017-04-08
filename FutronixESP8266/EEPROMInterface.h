@@ -1,23 +1,23 @@
 
-#ifndef __EEPROM_MANAGER_H__
-#define __EEPROM_MANAGER_H__
+#ifndef __EEPROM_INTERFACE_H__
+#define __EEPROM_INTERFACE_H__
 
 #include <EEPROM.h>
 
 #define EEPROM_SIZE 4096
 
 /****************************************
- * EEPROMManager
- * -------------
+ * EEPROMInterface
+ * ---------------
  * Read/write interface to the EEPROM memory. 
  */
-class EEPROMManager 
+class EEPROMInterface
 {
   private: 
     bool _enabled = false; 
     
   public: 
-    EEPROMManager(); 
+    EEPROMInterface(); 
 
     void begin(); 
     void readRaw(char* buffer, int len); 
@@ -45,54 +45,54 @@ class EEPROMManager
 
 
 /*---------------------------------------*/
-EEPROMManager::EEPROMManager()
+EEPROMInterface::EEPROMInterface()
 {
 }
 
 /*---------------------------------------*/
-void EEPROMManager::begin()
+void EEPROMInterface::begin()
 {
   this->_enabled = true; 
 }
 
 /*---------------------------------------*/
-void EEPROMManager::readRaw(char* buffer, int len)
+void EEPROMInterface::readRaw(char* buffer, int len)
 {
   this->readRaw(buffer, 0, len); 
 }
 
 /*---------------------------------------*/
-void EEPROMManager::readRaw(char* buffer, int start, int len)
+void EEPROMInterface::readRaw(char* buffer, int start, int len)
 {
   this->doRead(buffer, start, len, false, false); 
 }
 
 /*---------------------------------------*/
-void EEPROMManager::readAllRaw(char* buffer)
+void EEPROMInterface::readAllRaw(char* buffer)
 {
   this->readRaw(buffer, 0, EEPROM_SIZE); 
 }
 
 /*---------------------------------------*/
-void EEPROMManager::readString(char* buffer, int len)
+void EEPROMInterface::readString(char* buffer, int len)
 {
   this->readString(buffer, 0, len); 
 }
 
 /*---------------------------------------*/
-void EEPROMManager::readString(char* buffer, int start, int len)
+void EEPROMInterface::readString(char* buffer, int start, int len)
 {
   this->doRead(buffer, start, len, true, true); 
 }
 
 /*---------------------------------------*/
-void EEPROMManager::readAllString(char* buffer)
+void EEPROMInterface::readAllString(char* buffer)
 {
   this->readString(buffer, 0, EEPROM_SIZE+1); 
 }
 
 /*---------------------------------------*/
-void EEPROMManager::doRead(char* buffer, int start, int len, bool stopOnNull, bool terminateString)
+void EEPROMInterface::doRead(char* buffer, int start, int len, bool stopOnNull, bool terminateString)
 {
   if (this->_enabled)
   {
@@ -119,27 +119,27 @@ void EEPROMManager::doRead(char* buffer, int start, int len, bool stopOnNull, bo
 }
 
 /*---------------------------------------*/
-void EEPROMManager::write(const char* buffer, int len)
+void EEPROMInterface::write(const char* buffer, int len)
 {
   this->doWrite(buffer, 0, len, false, (len < EEPROM_SIZE)); 
 }
 
 /*---------------------------------------*/
-void EEPROMManager::writeString(const char* buffer)
+void EEPROMInterface::writeString(const char* buffer)
 {
   int len = strlen(buffer);
   this->doWrite(buffer, 0, len, true, (len < EEPROM_SIZE)); 
 }
 
 /*---------------------------------------*/
-void EEPROMManager::writeString(const char* buffer, int start)
+void EEPROMInterface::writeString(const char* buffer, int start)
 {
   int len = strlen(buffer);
   this->doWrite(buffer, start, len, true, (len < EEPROM_SIZE)); 
 }
 
 /*---------------------------------------*/
-void EEPROMManager::doWrite(const char* buffer, int start, int len, bool stopOnNull, bool terminateString)
+void EEPROMInterface::doWrite(const char* buffer, int start, int len, bool stopOnNull, bool terminateString)
 {
   if (this->_enabled)
   {
@@ -161,7 +161,7 @@ void EEPROMManager::doWrite(const char* buffer, int start, int len, bool stopOnN
 }
 
 /*---------------------------------------*/
-void EEPROMManager::clear()
+void EEPROMInterface::clear()
 {
   if (this->_enabled)
   {
@@ -177,14 +177,14 @@ void EEPROMManager::clear()
 }
 
 /*---------------------------------------*/
-void EEPROMManager::open()
+void EEPROMInterface::open()
 {
   if (this->_enabled)
     EEPROM.begin(EEPROM_SIZE);
 }
 
 /*---------------------------------------*/
-void EEPROMManager::close()
+void EEPROMInterface::close()
 {
   if (this->_enabled)
     EEPROM.end();

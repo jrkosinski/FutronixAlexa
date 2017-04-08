@@ -1,8 +1,8 @@
 
-#ifndef __DATABASE_MANAGER_H__
-#define __DATABASE_MANAGER_H__
+#ifndef __DATABASE_H__
+#define __DATABASE_H__
 
-#include "EEPROMManager.h"
+#include "EEPROMInterface.h"
 
 #define RECORD_FIXED_SIZE   50
 #define MAX_SCENES          12
@@ -46,18 +46,18 @@ class DatabaseRecord
 /****************************************/
 
 /****************************************
- * DatabaseManager
- * ---------------
+ * Database
+ * --------
  */
-class DatabaseManager 
+class Database 
 {
   private: 
     bool _enabled = false; 
-    EEPROMManager _eeprom;
+    EEPROMInterface _eeprom;
     DatabaseRecord _allRecords[MAX_SCENES];
   
   public: 
-    DatabaseManager(); 
+    Database(); 
 
     unsigned int getRecordCount(); 
 
@@ -102,14 +102,14 @@ class DatabaseManager
 
 
 /*---------------------------------------*/
-DatabaseManager::DatabaseManager()
+Database::Database()
 {
   for(int n=0; n<MAX_SCENES; n++)
     this->_allRecords[n].Index = n; 
 }
 
 /*---------------------------------------*/
-unsigned int DatabaseManager::getRecordCount()
+unsigned int Database::getRecordCount()
 {
   if (!this->_enabled)
     return 0;
@@ -118,7 +118,7 @@ unsigned int DatabaseManager::getRecordCount()
 }
 
 /*---------------------------------------*/
-DatabaseRecord* DatabaseManager::getRecord(unsigned int recordIndex)
+DatabaseRecord* Database::getRecord(unsigned int recordIndex)
 {
   if (recordIndex >= MAX_SCENES)
     recordIndex = (MAX_SCENES-1); 
@@ -130,7 +130,7 @@ DatabaseRecord* DatabaseManager::getRecord(unsigned int recordIndex)
 }
 
 /*---------------------------------------*/
-DatabaseRecord* DatabaseManager::getRecordByName(const char* name)
+DatabaseRecord* Database::getRecordByName(const char* name)
 {
   if (this->_enabled)
   {
@@ -145,7 +145,7 @@ DatabaseRecord* DatabaseManager::getRecordByName(const char* name)
 }
 
 /*---------------------------------------*/
-void DatabaseManager::setRecord(unsigned int recordIndex, const char* data)
+void Database::setRecord(unsigned int recordIndex, const char* data)
 {
   if (!this->_enabled)
     return;
@@ -158,7 +158,7 @@ void DatabaseManager::setRecord(unsigned int recordIndex, const char* data)
 }
 
 /*---------------------------------------*/
-DatabaseRecord* DatabaseManager::getAllRecords()
+DatabaseRecord* Database::getAllRecords()
 {
   if (!this->_enabled)
     return NULL;
@@ -181,7 +181,7 @@ DatabaseRecord* DatabaseManager::getAllRecords()
 }
 
 /*---------------------------------------*/
-void DatabaseManager::begin()
+void Database::begin()
 {
   DEBUG_PRINTLN("DB: begin"); 
   this->_enabled = true; 
@@ -190,7 +190,7 @@ void DatabaseManager::begin()
 }
 
 /*---------------------------------------*/
-void DatabaseManager::clear(bool clearProgramMemory)
+void Database::clear(bool clearProgramMemory)
 {
   if (!this->_enabled)
     return;
@@ -208,7 +208,7 @@ void DatabaseManager::clear(bool clearProgramMemory)
 }
 
 /*---------------------------------------*/
-void DatabaseManager::save()
+void Database::save()
 {
   if (!this->_enabled)
     return;
@@ -229,7 +229,7 @@ void DatabaseManager::save()
 }
 
 /*---------------------------------------*/
-void DatabaseManager::test()
+void Database::test()
 {
   this->_eeprom.clear(); 
   delay(1000); 

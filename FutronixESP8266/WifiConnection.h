@@ -1,6 +1,6 @@
 
-#ifndef __WIFI_MANAGER_H__
-#define __WIFI_MANAGER_H__
+#ifndef __WIFI_CONNECTION_H__
+#define __WIFI_CONNECTION_H__
 
 #define WIFI_SSID "Mina";
 #define WIFI_PASSWD "HappyTime";
@@ -14,10 +14,11 @@
 
 
 /****************************************
- * WifiManager
- * -----------
+ * WifiConnection
+ * --------------
+ * Connects to the Wifi. 
  */
-class WifiManager
+class WifiConnection
 {
   private: 
     ESP8266WiFiMulti _wiFiMulti;
@@ -29,7 +30,7 @@ class WifiManager
     bool isConnected; 
     
   public:
-    WifiManager(); 
+    WifiConnection(); 
 
     void begin(); 
     bool connect(); 
@@ -37,7 +38,7 @@ class WifiManager
 /****************************************/
 
 /*---------------------------------------*/
-WifiManager::WifiManager()
+WifiConnection::WifiConnection()
 {
   this->isConnected = false;
   this->_wifiSsid = WIFI_SSID; 
@@ -45,13 +46,13 @@ WifiManager::WifiManager()
 }
 
 /*---------------------------------------*/
-void WifiManager::begin()
+void WifiConnection::begin()
 {
   this->_enabled = true; 
 }
 
 /*---------------------------------------*/
-bool WifiManager::connect()
+bool WifiConnection::connect()
 {
   this->_wiFiMulti.addAP(this->_wifiSsid, this->_wifiPasswd);
     

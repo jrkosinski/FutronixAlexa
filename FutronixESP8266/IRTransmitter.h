@@ -1,17 +1,17 @@
 
-#ifndef __IR_MANAGER_H__
-#define __IR_MANAGER_H__
+#ifndef __IR_TRANSMITTER_H__
+#define __IR_TRANSMITTER_H__
 
 #define IR_PIN              0
 #define FUTRONIX_INTERVAL   1560
 #define FUTRONIX_CMD_GAP    1620
 
 /****************************************
- * IRManager
- * ---------
+ * IRTransmitter
+ * -------------
  * Transmits infrared pulses through a selected pin. 
  */
-class IRManager
+class IRTransmitter
 {
   private: 
     int _pin; 
@@ -19,8 +19,8 @@ class IRManager
     int _halfPeriodicTime;
 
   public:
-    IRManager();
-    ~IRManager();
+    IRTransmitter();
+    ~IRTransmitter();
 
     void begin();   
     void test(int repeat);
@@ -73,19 +73,19 @@ uint32_t IRtimer::elapsed() {
 }
 
 /*---------------------------------------*/
-IRManager::IRManager()
+IRTransmitter::IRTransmitter()
 {
   this->_pin = IR_PIN; 
   this->_enabled = false; 
 }
 
 /*---------------------------------------*/
-IRManager::~IRManager()
+IRTransmitter::~IRTransmitter()
 {
 }
 
 /*---------------------------------------*/
-void IRManager::begin()
+void IRTransmitter::begin()
 {
   this->_enabled = true; 
   DEBUG_PRINTLN("Setting ir pin to OUTPUT - pin ");
@@ -94,7 +94,7 @@ void IRManager::begin()
 }
 
 /*---------------------------------------*/
-void IRManager::test(int repeat)
+void IRTransmitter::test(int repeat)
 {
   for(int n=0; n<repeat; n++)
   {
@@ -106,7 +106,7 @@ void IRManager::test(int repeat)
 }
 
 /*---------------------------------------*/
-void IRManager::sendFutronix(unsigned long command) 
+void IRTransmitter::sendFutronix(unsigned long command) 
 {
   if (this->_enabled)
   {
@@ -188,7 +188,7 @@ void IRManager::sendFutronix(unsigned long command)
 }
 
 /*---------------------------------------*/
-void IRManager::mark(unsigned int usec) 
+void IRTransmitter::mark(unsigned int usec) 
 {
   // Sends an IR mark for the specified number of microseconds.
   // The mark output is modulated at the PWM frequency.
@@ -205,20 +205,20 @@ void IRManager::mark(unsigned int usec)
 }
 
 /*---------------------------------------*/
-void IRManager::pinOn() 
+void IRTransmitter::pinOn() 
 {
   digitalWrite(IR_PIN, LOW);
 }
 
 /*---------------------------------------*/
-void IRManager::pinOff() 
+void IRTransmitter::pinOff() 
 {
   digitalWrite(IR_PIN, HIGH);
 }
 
 /*---------------------------------------*/
 /* Leave pin off for time (given in microseconds) */
-void IRManager::space(unsigned long time) 
+void IRTransmitter::space(unsigned long time) 
 {
   // Sends an IR space for the specified number of microseconds.
   // A space is no output, so the PWM output is disabled.
@@ -234,7 +234,7 @@ void IRManager::space(unsigned long time)
 }
 
 /*---------------------------------------*/
-void IRManager::enableIROut(int khz) 
+void IRTransmitter::enableIROut(int khz) 
 {
   // Enables IR output.
   // The khz value controls the modulation frequency in kilohertz.
@@ -244,7 +244,7 @@ void IRManager::enableIROut(int khz)
 }
 
 /*---------------------------------------*/
-void IRManager::doSendFutronix(unsigned long command, int headerType, int footerType, bool reverse, int bitmark) {
+void IRTransmitter::doSendFutronix(unsigned long command, int headerType, int footerType, bool reverse, int bitmark) {
   
   // Set IR carrier frequency
   enableIROut(38);

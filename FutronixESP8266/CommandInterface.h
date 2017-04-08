@@ -2,7 +2,7 @@
 #ifndef __FUTRONIX_INTERFACE_H__
 #define __FUTRONIX_INTERFACE_H__
 
-#include "IRManager.h"
+#include "IRTransmitter.h"
 
 /****************************************
  * CommandInterface
@@ -12,7 +12,7 @@
 class CommandInterface 
 {
   private: 
-    IRManager _irManager; 
+    IRTransmitter _irTransmitter; 
     bool _enabled = false; 
     
   public: 
@@ -34,7 +34,7 @@ CommandInterface::CommandInterface()
 void CommandInterface::begin()
 {
   this->_enabled = true; 
-  this->_irManager.begin();
+  this->_irTransmitter.begin();
 }
 
 /*---------------------------------------*/
