@@ -17,8 +17,11 @@ class EEPROMInterface
 {
   private: 
     bool _enabled = false; 
+    bool _isBusy = false;
     
   public: 
+    bool isBusy() { return this->_isBusy;}
+    
     EEPROMInterface(); 
 
     void begin(); 
@@ -159,6 +162,10 @@ void EEPROMInterface::doWrite(const char* buffer, int start, int len, bool stopO
       len = EEPROM_SIZE; 
 
     int dbIndex = 0; 
+
+    if (len == 0 && terminateString)
+      EEPROM.write(start, 0); 
+      
     for(int n=0; n<len; n++)
     {
       dbIndex = (n+start);
@@ -202,14 +209,20 @@ void EEPROMInterface::clear()
 void EEPROMInterface::open()
 {
   if (this->_enabled)
+  {
+    this->_isBusy = true;
     EEPROM.begin(EEPROM_SIZE);
+  }
 }
 
 /*---------------------------------------*/
 void EEPROMInterface::close()
 {
   if (this->_enabled)
+  {
     EEPROM.end();
+    this->_isBusy = false;
+  }
 }
 
 #endif

@@ -100,14 +100,14 @@ void FutronixESP8266::begin()
   this->_command->begin();
   this->_db->begin(); 
 
-  this->_db->setRecord(0, "red");
-  this->_db->setRecord(2, "blue");
-  this->_db->getAllRecords();
+  this->_db->setRecord(0, "");
+  this->_db->setRecord(2, "");
+  //this->_db->getAllRecords();
 
   if (this->_wifi->connect())
   {
-  //  this->_wemo->begin();
-  //  this->startWemoServers();
+    this->_wemo->begin();
+    this->startWemoServers();
   }
 }
 
@@ -174,17 +174,12 @@ void FutronixESP8266::startWemoServers()
   //add wemo server/listeners for every scene & scene name 
   for(int n=0; n<this->_db->getRecordCount(); n++)
   {
-    char buffer[10]; 
-    memcpy(buffer, "scene ", strlen("scene ")); 
-    char* pBuf = buffer; 
-    itoa((n+1), pBuf+strlen(buffer), 10); 
-
     //scene numbers 
-    this->_wemo->addDevice(buffer, baseNumberPort+n, new SceneNumberCallbackHandler(this->_command, n));
+    this->_wemo->addDevice((String("scene ") + String(n+1)).c_str(), baseNumberPort+n, new SceneNumberCallbackHandler(this->_command, n));
 
     //scene names 
     if (strlen(records[n].getData()) > 0)
-      this->_wemo->addDevice(buffer, baseNamePort+n, new SceneNameCallbackHandler(this->_command, this->_db, records[n].getData())); 
+      this->_wemo->addDevice(records[n].getData(), baseNamePort+n, new SceneNameCallbackHandler(this->_command, this->_db, records[n].getData())); 
   }
 }
 

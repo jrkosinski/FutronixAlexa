@@ -134,6 +134,7 @@ void WemoServer::stop()
 /*---------------------------------------*/
 void WemoServer::startWebServer()
 {
+  Serial.printf("settings heap size: %u\n", ESP.getFreeHeap());
   this->_server = new ESP8266WebServer(this->_localPort);
 
   this->_server->on("/", [&]() {
@@ -157,6 +158,8 @@ void WemoServer::startWebServer()
 
   DEBUG_PRINTLN("WebServer started on port: ");
   DEBUG_PRINTLN(_localPort);
+  
+  delay(1000); 
 }
 
 /*---------------------------------------*/

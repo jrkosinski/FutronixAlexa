@@ -9,7 +9,7 @@
 
 #include "WemoServer.h"
 
-#define SERVER_COUNT_LIMIT 20
+#define SERVER_COUNT_LIMIT 40
 
 IPAddress _ipMulti(239, 255, 255, 250);
 
