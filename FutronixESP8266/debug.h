@@ -1,7 +1,7 @@
 #ifndef __FUTRONIX_DEBUG_H__
 #define __FUTRONIX_DEBUG_H__
 
-#define DEBUG 1
+#define DEBUG 0
 #define DEBUG_PRINT     debugPrint
 #define DEBUG_PRINTLN   debugPrintln
 #define DEBUG_SHOWHEAP  debugShowHeap()
