@@ -33,6 +33,7 @@ class AdminServer
     void handleSetScene(); 
     void handleGetCurrentScene(); 
     void handleRestartWemoServers(); 
+    void handleSetup(); 
 };
 /****************************************/
 
@@ -69,6 +70,10 @@ void AdminServer::begin()
     
   this->_server->on("/admin/restartWemoServers", [&]() {
     this->handleRestartWemoServers();
+  });
+    
+  this->_server->on("/admin/setup", [&]() {
+    this->handleSetup();
   });
 
   this->_server->begin();
@@ -121,6 +126,22 @@ void AdminServer::handleGetCurrentScene()
 void AdminServer::handleRestartWemoServers()
 {
    
+}
+ 
+/*---------------------------------------*/
+void AdminServer::handleSetup()
+{
+  //get arguments from querystring 
+  String clearDbArg = this->_server->arg("clearDatabase");   
+  String wifiSsid = this->_server->arg("wifiSsid");
+  String wifiPasswd = this->_server->arg("wifiPasswd");
+  
+  bool clearDatabase = false;
+  if (strcmp(clearDbArg.c_str(), "clearDb") == 0)
+    clearDatabase = true;
+
+  //run setup
+  this->_futronix->setup(wifiSsid.c_str(), wifiPasswd.c_str(), clearDatabase);
 }
 
 

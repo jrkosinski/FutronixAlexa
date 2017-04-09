@@ -4,6 +4,7 @@
 #define DEBUG 1
 #define DEBUG_PRINT     debugPrint
 #define DEBUG_PRINTLN   debugPrintln
+#define DEBUG_SHOWHEAP  debugShowHeap()
 
 /*
 #ifdef DEBUG
@@ -22,6 +23,8 @@ void debugPrint(int);
 void debugPrintln(const char*); 
 void debugPrintln(String&); 
 void debugPrintln(int); 
+
+void debugShowHeap();
 
 /*---------------------------------------*/
 void debugPrint(const char* s)
@@ -68,6 +71,14 @@ void debugPrintln(int n)
 {
 #ifdef DEBUG
   Serial.println(n);
+#endif
+}
+
+/*---------------------------------------*/
+void debugShowHeap()
+{
+#ifdef DEBUG
+  DEBUG_SHOWHEAP; 
 #endif
 }
 

@@ -6,7 +6,14 @@
 
 #define RECORD_FIXED_SIZE   50
 #define MAX_SCENES          12
+#define EXTRA_RECORDS       2
+#define TOTAL_DB_SIZE       ((RECORD_FIXED_SIZE * MAX_SCENES) + (EXTRA_RECORDS * RECORD_FIXED_SIZE))
 
+#define WIFI_SSID_RECORD_INDEX    0
+#define WIFI_PASSWD_RECORD_INDEX  1
+
+
+//TODO: This should be refactored to allow for easier storage of all different kinds of records 
 
 /****************************************
  * DatabaseRecord
@@ -32,9 +39,7 @@ class DatabaseRecord
     {
       int len = strlen(data);
       if (len > (RECORD_FIXED_SIZE-1))
-      {
         len = RECORD_FIXED_SIZE-1; 
-      }
 
       memcpy(this->_data, data, len);
       this->_data[len] = 0; 
@@ -55,11 +60,17 @@ class Database
     bool _enabled = false; 
     EEPROMInterface _eeprom;
     DatabaseRecord _allRecords[MAX_SCENES];
+    DatabaseRecord _wifiSsid;
+    DatabaseRecord _wifiPasswd;
   
   public: 
     Database(); 
 
     unsigned int getRecordCount(); 
+    char* getWifiSsid();
+    char* getWifiPasswd(); 
+    void setWifiSsid(const char* data);
+    void setWifiPasswd(const char* data); 
 
     /***
      * Reads a single record off of EEPROM.
@@ -96,6 +107,12 @@ class Database
      * specified to clear it. 
      */
     void clear(bool clearProgramMemory);
+
+    /***
+     * Saves the Wifi name & password. 
+     */
+    void setWifiData(const char* ssid, const char* passwd);
+    
     void test(); 
 };
 /****************************************/
@@ -105,7 +122,13 @@ class Database
 Database::Database()
 {
   for(int n=0; n<MAX_SCENES; n++)
+  {
     this->_allRecords[n].Index = n; 
+    this->_allRecords[n].setData("");
+  }
+  
+  this->_wifiSsid.setData("");
+  this->_wifiPasswd.setData("");
 }
 
 /*---------------------------------------*/
@@ -115,6 +138,34 @@ unsigned int Database::getRecordCount()
     return 0;
     
   return MAX_SCENES; 
+}
+
+/*---------------------------------------*/
+char* Database::getWifiSsid()
+{
+  return this->_wifiSsid.getData(); 
+}
+
+/*---------------------------------------*/
+char* Database::getWifiPasswd()
+{
+  return this->_wifiPasswd.getData();
+}
+
+/*---------------------------------------*/
+void Database::setWifiSsid(const char* data)
+{
+  this->_wifiSsid.setData(data);
+  if (this->_enabled)
+    this->_eeprom.writeString(this->_wifiSsid.getData(), (MAX_SCENES + WIFI_SSID_RECORD_INDEX) * RECORD_FIXED_SIZE); 
+}
+
+/*---------------------------------------*/
+void Database::setWifiPasswd(const char* data)
+{
+  this->_wifiPasswd.setData(data);
+  if (this->_enabled)
+    this->_eeprom.writeString(this->_wifiPasswd.getData(), (MAX_SCENES + WIFI_PASSWD_RECORD_INDEX) * RECORD_FIXED_SIZE); 
 }
 
 /*---------------------------------------*/
@@ -174,7 +225,7 @@ DatabaseRecord* Database::getAllRecords()
     
   DEBUG_PRINTLN("Database:getAllRecords"); 
   
-  int len = MAX_SCENES * RECORD_FIXED_SIZE;
+  int len = TOTAL_DB_SIZE;
   char buffer[len + 1]; 
   buffer[len+1] = 0; 
   char* pBuf = (char*)buffer; 
@@ -188,6 +239,16 @@ DatabaseRecord* Database::getAllRecords()
     pBuf += (RECORD_FIXED_SIZE * sizeof(char)); 
     
     DEBUG_PRINTLN(String(this->_allRecords[n].Index) + ":" + this->_allRecords[n].getData()); 
+  }
+
+  for(int n=0; n<EXTRA_RECORDS; n++)
+  {
+    if (n == WIFI_SSID_RECORD_INDEX)
+      _wifiSsid.setData(pBuf); 
+    else if (n == WIFI_PASSWD_RECORD_INDEX)
+      _wifiPasswd.setData(pBuf);
+      
+    pBuf += (RECORD_FIXED_SIZE * sizeof(char)); 
   }
   
   return this->_allRecords; 
@@ -230,13 +291,23 @@ void Database::save()
     
   DEBUG_PRINTLN("DB: Saving"); 
 
-  int len = MAX_SCENES * RECORD_FIXED_SIZE;
+  int len = TOTAL_DB_SIZE;
   char buffer[len]; 
   char* pBuf = buffer; 
 
   for(int n=0; n<MAX_SCENES; n++)
   {
     memcpy(pBuf, this->_allRecords[n].getData(), RECORD_FIXED_SIZE); 
+    pBuf += (RECORD_FIXED_SIZE * sizeof(char)); 
+  }
+
+  for(int n=0; n<EXTRA_RECORDS; n++)
+  {
+    if (n == WIFI_SSID_RECORD_INDEX)
+      memcpy(pBuf, this->_allRecords[n].getData(), RECORD_FIXED_SIZE); 
+    else if (n == WIFI_PASSWD_RECORD_INDEX)
+      memcpy(pBuf, this->_allRecords[n].getData(), RECORD_FIXED_SIZE); 
+      
     pBuf += (RECORD_FIXED_SIZE * sizeof(char)); 
   }
 

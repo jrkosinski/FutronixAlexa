@@ -2,9 +2,6 @@
 #ifndef __WIFI_CONNECTION_H__
 #define __WIFI_CONNECTION_H__
 
-#define WIFI_SSID     "mina"
-#define WIFI_PASSWD   "HappyTime"
-
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 #include <WiFiClient.h>
@@ -22,15 +19,15 @@ class WifiConnection
 {
   private: 
     ESP8266WiFiMulti _wiFiMulti;
-    char* _wifiPasswd; 
-    char* _wifiSsid; 
+    const char* _wifiPasswd; 
+    const char* _wifiSsid; 
     bool _enabled = false; 
 
   public:
     bool isConnected; 
     
   public:
-    WifiConnection(); 
+    WifiConnection(const char* ssid, const char* passwd); 
 
     void begin(); 
     bool connect(); 
@@ -38,11 +35,11 @@ class WifiConnection
 /****************************************/
 
 /*---------------------------------------*/
-WifiConnection::WifiConnection()
+WifiConnection::WifiConnection(const char* ssid, const char* passwd)
 {
   this->isConnected = false;
-  this->_wifiSsid = WIFI_SSID; 
-  this->_wifiPasswd = WIFI_PASSWD; 
+  this->_wifiSsid = ssid; 
+  this->_wifiPasswd = passwd; 
 }
 
 /*---------------------------------------*/

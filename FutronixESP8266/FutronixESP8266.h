@@ -45,6 +45,11 @@ class FutronixESP8266
     void loop();
 
     /***
+     * does initial setup of DB & chip 
+     */
+    void setup(const char* wifiSsid, const char* wifiPasswd, bool clearDatabase); 
+
+    /***
      * gets entire contens of scene-names DB
      */
     DatabaseRecord* getAllSceneNames(); 
@@ -84,10 +89,10 @@ class FutronixESP8266
 FutronixESP8266::FutronixESP8266()
 {
   this->_led = new LEDOutput();
-  this->_command = new CommandInterface(); 
-  this->_wifi = new WifiConnection(); 
-  this->_wemo = new WemoEmulator(); 
   this->_db = new Database();
+  this->_command = new CommandInterface(); 
+  this->_wifi = new WifiConnection(this->_db->getWifiSsid(), this->_db->getWifiPasswd()); 
+  this->_wemo = new WemoEmulator(); 
 }
 
 /*---------------------------------------*/
@@ -115,6 +120,20 @@ void FutronixESP8266::begin()
 void FutronixESP8266::loop()
 {
   //this->_wemo->listen();
+}
+
+/*---------------------------------------*/
+void FutronixESP8266::setup(const char* wifiSsid, const char* wifiPasswd, bool clearDatabase)
+{
+  //clear database 
+  if (clearDatabase)
+  {
+    this->_db->clear(true);
+  }
+
+  //set wifi name & passwd
+  this->_db->setWifiSsid(wifiSsid);
+  this->_db->setWifiPasswd(wifiPasswd);
 }
 
 /*---------------------------------------*/
