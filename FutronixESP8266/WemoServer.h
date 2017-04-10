@@ -112,6 +112,7 @@ void WemoServer::respondToSearch(IPAddress& senderIP, unsigned int senderPort)
   this->_udp.beginPacket(senderIP, senderPort);
   this->_udp.write(response.c_str());
   this->_udp.endPacket();
+  this->listen();
 }
 
 /*---------------------------------------*/
@@ -135,8 +136,8 @@ void WemoServer::stop()
 /*---------------------------------------*/
 void WemoServer::startWebServer()
 {
-  Serial.printf("settings heap size: %u\n", ESP.getFreeHeap());
   this->_server = new ESP8266WebServer(this->_localPort);
+  DEBUG_SHOWHEAP();
 
   this->_server->on("/index.html", [&]() {
     DEBUG_PRINTLN("index.html");
@@ -164,8 +165,6 @@ void WemoServer::startWebServer()
 
   DEBUG_PRINTLN("WebServer started on port: ");
   DEBUG_PRINTLN(_localPort);
-  
-  delay(1000); 
 }
 
 /*---------------------------------------*/

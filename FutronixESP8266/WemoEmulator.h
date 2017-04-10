@@ -90,15 +90,6 @@ void WemoEmulator::listen()
   if (!this->_enabled)
     return; 
     
-  for(int n = 0; n < this->_serverCount; n++) {
-    WemoServer* server = _servers[n];
-
-    if (server != NULL) {
-      server->listen();
-      delay(1);
-    }
-  }
-    
   //DEBUG_PRINTLN("WemoEmulator:listen");
   
   int packetSize = this->_udp.parsePacket();
@@ -127,8 +118,12 @@ void WemoEmulator::listen()
       }
     }
   }
-  
-  delay(10);
+
+  for(int n=0; n<this->_serverCount; n++)
+  {
+    if (this->_servers[n] != NULL)
+      this->_servers[n]->listen();
+  }
 }
 
 /*---------------------------------------*/
