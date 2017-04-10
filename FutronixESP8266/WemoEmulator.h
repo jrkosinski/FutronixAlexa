@@ -11,8 +11,6 @@
 
 #define SERVER_COUNT_LIMIT 40
 
-IPAddress _ipMulti(239, 255, 255, 250);
-
 /****************************************
  * WemoEmulator
  * ------------
@@ -70,10 +68,11 @@ void WemoEmulator::begin()
   
   DEBUG_PRINTLN("WemoEmulator:begin");
   
-  if (this->_udp.beginMulticast(WiFi.localIP(), _ipMulti, this->_portMulti)) 
+  IPAddress ipMulti(239, 255, 255, 250);
+  if (this->_udp.beginMulticast(WiFi.localIP(), ipMulti, this->_portMulti)) 
   {
     DEBUG_PRINTLN("Udp multicast server started at ");
-    DEBUG_PRINTLN(_ipMulti);
+    DEBUG_PRINTLN(ipMulti);
     DEBUG_PRINTLN(":");
     DEBUG_PRINTLN(this->_portMulti);
 

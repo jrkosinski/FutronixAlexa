@@ -18,8 +18,8 @@ class LEDOutput
     LEDOutput();
     
     void begin(); 
-    void ledOn(); 
-    void ledOff(); 
+    void on(); 
+    void off(); 
     void blink(); 
     void blink(int);     
 };
@@ -40,7 +40,7 @@ void LEDOutput::begin()
 }
 
 /*---------------------------------------*/
-void LEDOutput::ledOn()
+void LEDOutput::on()
 {
   if (this->_enabled)
   {
@@ -49,7 +49,7 @@ void LEDOutput::ledOn()
 }
 
 /*---------------------------------------*/
-void LEDOutput::ledOff()
+void LEDOutput::off()
 {
   if (this->_enabled)
   {
@@ -68,9 +68,9 @@ void LEDOutput::blink(int times)
 {
   for(int i=0; i<times; i++)
   {
-    this->ledOn(); 
+    this->on(); 
     delay(100); 
-    this->ledOff(); 
+    this->off(); 
     delay(300); 
   }
 }

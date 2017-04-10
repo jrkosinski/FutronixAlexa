@@ -53,6 +53,22 @@ void WifiConnection::begin()
 bool WifiConnection::connect()
 {
   DEBUG_PRINTLN(String("Wifi:connect ") + this->_wifiSsid + " / " + this->_wifiPasswd); 
+  
+  /*
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(this->_wifiSsid, this->_wifiPasswd);
+  
+  DEBUG_PRINTLN ("connecting to wifi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    DEBUG_PRINT(".");
+  }
+  DEBUG_PRINTLN ("Wifi:connected");
+  DEBUG_PRINT("Wifi:IP address: ");
+  DEBUG_PRINTLN(WiFi.localIP().toString().c_str());
+
+  */
+  
   this->_wiFiMulti.addAP(this->_wifiSsid, this->_wifiPasswd);
     
   DEBUG_PRINTLN ("connecting to wifi");

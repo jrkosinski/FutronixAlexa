@@ -1,11 +1,13 @@
 #ifndef __ADMIN_SERVER_H__
 #define __ADMIN_SERVER_H__
 
+#include <WiFiUDP.h>
 #include <ESP8266WebServer.h>
 #include "FutronixESP8266.h"
 
 //TODO: run more than one instance on the wifi network
 #define ADMIN_SERVER_PORT 1001 
+#define ADMIN_UDP_PORT    2001 
 
 /****************************************
  * AdminServer
@@ -16,14 +18,18 @@
 class AdminServer
 {
   private:
-    int _localPort = ADMIN_SERVER_PORT;
+    int _localTcpPort = ADMIN_SERVER_PORT;
+    int _localUdpPort = ADMIN_UDP_PORT;
     ESP8266WebServer* _server = NULL; 
     FutronixESP8266* _futronix = NULL; 
+    WiFiUDP _udp;  
+    char _packetBuffer[512];
     
   public: 
     AdminServer(FutronixESP8266* futronix);
 
     void begin(); 
+    void listen();
 
   private: 
     //request handlers 
@@ -34,6 +40,7 @@ class AdminServer
     void handleGetCurrentScene(); 
     void handleRestartWemoServers(); 
     void handleSetup(); 
+    void handleStatus(); 
 };
 /****************************************/
 
@@ -46,7 +53,7 @@ AdminServer::AdminServer(FutronixESP8266* futronix)
 /*---------------------------------------*/
 void AdminServer::begin()
 {
-  this->_server = new ESP8266WebServer(this->_localPort);
+  this->_server = new ESP8266WebServer(this->_localTcpPort);
 
   this->_server->on("/admin/getSceneNames", [&]() {
     this->handleGetSceneNames();
@@ -75,10 +82,53 @@ void AdminServer::begin()
   this->_server->on("/admin/setup", [&]() {
     this->handleSetup();
   });
+    
+  this->_server->on("/admin/status", [&]() {
+    this->handleStatus();
+  });
 
   this->_server->begin();
 
-  DEBUG_PRINTLN(String("AdminServer started on port: ") + _localPort);
+  DEBUG_PRINTLN(String("AdminServer: started on port ") + _localTcpPort);
+
+  //open UDP port
+  this->_udp.begin(this->_localUdpPort); 
+}
+
+/*---------------------------------------*/
+void AdminServer::listen()
+{
+  int packetSize = this->_udp.parsePacket();
+  if (packetSize)
+  {
+    Serial.printf("AdminServer:listen Received %d bytes from %s, port %d\n", packetSize, this->_udp.remoteIP().toString().c_str(), this->_udp.remotePort());
+    int len = this->_udp.read(this->_packetBuffer, 255);
+    Serial.printf("AdminServer: UDP packet contents: %s\n", this->_packetBuffer);
+    
+    if (len > 0)
+    {
+      this->_packetBuffer[len] = 0;
+
+      //if it's the right type of request...
+      if (strcmp(this->_packetBuffer, MAGIC_WORD) == 0)
+      {
+        //...send a response 
+        /*
+        DEBUG_PRINTLN("AdminServer: send response"); 
+        this->_udp.beginPacket(this->_udp.remoteIP(), 2003);
+        this->_udp.write(MAGIC_WORD);
+        this->_udp.endPacket();
+        */
+        WiFiClient client; 
+        DEBUG_PRINTLN(String("AdminServer: connecting to ") + this->_udp.remoteIP().toString().c_str());
+        if (client.connect("192.168.1.38", 2003))
+        {
+          DEBUG_PRINTLN(String("AdminServer: connected to ") + this->_udp.remoteIP().toString().c_str());
+          client.print("port 1001 mofo");
+        }
+      }
+    }
+  }
 }
 
 /*---------------------------------------*/
@@ -142,6 +192,15 @@ void AdminServer::handleSetup()
 
   //run setup
   this->_futronix->setup(wifiSsid.c_str(), wifiPasswd.c_str(), clearDatabase);
+}
+ 
+/*---------------------------------------*/
+void AdminServer::handleStatus()
+{
+  if (this->_futronix->hasBeenSetUp())
+    this->_server->send(200, "text/plain", "");
+  else 
+    this->_server->send(404, "text/plain", ""); 
 }
 
 

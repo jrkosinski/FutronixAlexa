@@ -4,7 +4,8 @@
 
 #define IR_PIN              0
 #define FUTRONIX_INTERVAL   1560
-#define FUTRONIX_CMD_GAP    1620
+#define FUTRONIX_BITMARK    700
+#define FUTRONIX_CMD_GAP    102
 
 /****************************************
  * IRTransmitter
@@ -24,7 +25,7 @@ class IRTransmitter
 
     void begin();   
     void test(int repeat);
-    void sendFutronix(unsigned long command); 
+    void sendFutronix(unsigned short command); 
 
   private: 
     void pinOn();
@@ -32,7 +33,6 @@ class IRTransmitter
     void enableIROut(int khz);
     void mark(unsigned int usec);
     void space(unsigned long usec);
-    void doSendFutronix(unsigned long command, int headerType, int footerType, bool reverse, int bitmark);
 };
 /****************************************/
 
@@ -91,99 +91,114 @@ void IRTransmitter::begin()
   DEBUG_PRINTLN("Setting ir pin to OUTPUT - pin ");
   DEBUG_PRINTLN(IR_PIN); 
   pinMode(IR_PIN, OUTPUT);
+  this->pinOff(); 
 }
 
 /*---------------------------------------*/
 void IRTransmitter::test(int repeat)
 {
-  for(int n=0; n<repeat; n++)
-  {
-    DEBUG_PRINTLN("testing"); 
-    this->mark(1000);
-    this->pinOff(); 
-    delay(4000); 
-  }
+  this->pinOff();  
+  this->sendFutronix(17); 
+  this->pinOff();
 }
 
 /*---------------------------------------*/
-void IRTransmitter::sendFutronix(unsigned long command) 
+void IRTransmitter::sendFutronix(unsigned short command) 
 {
   if (this->_enabled)
   {
-    int footerType = 0; 
-    int headerType = 0; 
+    //reverse the 6 command bits
+    bool commandBits[6]; 
+    int nbits = 6; 
+    int onesCount = 0; 
+    int index = 0; 
+    for (unsigned short mask = 1UL << (nbits - 1); mask; mask >>= 1) 
+    {
+      if (command & mask) 
+      {  
+        // 1
+        DEBUG_PRINTLN("one");
+        commandBits[index++] = true; 
+        onesCount++; 
+      } 
+      else
+      {
+        DEBUG_PRINTLN("zero");
+        commandBits[index++] = false; 
+      }
+    }
+      
+    DEBUG_PRINTLN("Setting scene "); //, bitmark %d, headerType %d, footerType %d", bitmark, headerType, footerType); 
     
     for(int i=0; i<2; i++)
     {
-      headerType = i; 
+      // Set IR carrier frequency
+      enableIROut(38);
       
-      for(int n=0; n<3; n++)
+      //DEBUG_PRINTLN(FUTRONIX_BITMARK); 
+      
+      //header
+      //DEBUG_PRINTLN("\nheader:"); 
+      mark(FUTRONIX_BITMARK); 
+      space((FUTRONIX_INTERVAL * 4) - FUTRONIX_BITMARK); 
+      mark(FUTRONIX_BITMARK); 
+      space((FUTRONIX_INTERVAL) - FUTRONIX_BITMARK); 
+
+      //address (4 0s) 
+      //DEBUG_PRINTLN("\address:"); 
+      for(int n=0; n<4; n++)
       {
-        footerType = n; 
-        
-        bool reverse = false;
-        doSendFutronix(command, headerType, footerType, reverse, 700); 
-        delay(FUTRONIX_CMD_GAP); 
-        doSendFutronix(command, headerType, footerType, reverse, 700); 
-        delay(2000); 
-        
-        doSendFutronix(command, headerType, footerType, reverse, 750); 
-        delay(FUTRONIX_CMD_GAP); 
-        doSendFutronix(command, headerType, footerType, reverse, 750); 
-        delay(2000); 
-        
-        doSendFutronix(command, headerType, footerType, reverse, 767); 
-        delay(FUTRONIX_CMD_GAP); 
-        doSendFutronix(command, headerType, footerType, reverse, 767); 
-        delay(2000); 
-        
-        doSendFutronix(command, headerType, footerType, reverse, 769); 
-        delay(FUTRONIX_CMD_GAP); 
-        doSendFutronix(command, headerType, footerType, reverse, 769); 
-        delay(2000); 
-        
-        doSendFutronix(command, headerType, footerType, reverse, 800); 
-        delay(FUTRONIX_CMD_GAP); 
-        doSendFutronix(command, headerType, footerType, reverse, 800); 
-        delay(2000); 
-        
-        doSendFutronix(command, headerType, footerType, reverse, 900); 
-        delay(FUTRONIX_CMD_GAP); 
-        doSendFutronix(command, headerType, footerType, reverse, 900); 
-        delay(2000); 
-        
-        reverse = true;
-        doSendFutronix(command, headerType, footerType, reverse, 700); 
-        delay(FUTRONIX_CMD_GAP); 
-        doSendFutronix(command, headerType, footerType, reverse, 700); 
-        delay(2000); 
-        
-        doSendFutronix(command, headerType, footerType, reverse, 750); 
-        delay(FUTRONIX_CMD_GAP); 
-        doSendFutronix(command, headerType, footerType, reverse, 750); 
-        delay(2000); 
-        
-        doSendFutronix(command, headerType, footerType, reverse, 767); 
-        delay(FUTRONIX_CMD_GAP); 
-        doSendFutronix(command, headerType, footerType, reverse, 767); 
-        delay(2000); 
-        
-        doSendFutronix(command, headerType, footerType, reverse, 769); 
-        delay(FUTRONIX_CMD_GAP); 
-        doSendFutronix(command, headerType, footerType, reverse, 769); 
-        delay(2000); 
-        
-        doSendFutronix(command, headerType, footerType, reverse, 800); 
-        delay(FUTRONIX_CMD_GAP); 
-        doSendFutronix(command, headerType, footerType, reverse, 800); 
-        delay(2000); 
-        
-        doSendFutronix(command, headerType, footerType, reverse, 900); 
-        delay(FUTRONIX_CMD_GAP); 
-        doSendFutronix(command, headerType, footerType, reverse, 900); 
-        delay(2000); 
+        mark(FUTRONIX_BITMARK);
+        space((FUTRONIX_INTERVAL) - FUTRONIX_BITMARK); 
       }
+      
+      //command 6 bits
+      //DEBUG_PRINTLN("\command:"); 
+      int bitPosition = 5; 
+      for(int n = 5; n>=0; n--)
+      {
+        if (commandBits[n])
+        {
+          mark(FUTRONIX_BITMARK);
+          if (bitPosition % 2 == 0)
+            space((FUTRONIX_INTERVAL * 3) - FUTRONIX_BITMARK); 
+          else 
+            space((FUTRONIX_INTERVAL * 2) - FUTRONIX_BITMARK); 
+        }
+        else
+        {
+          mark(FUTRONIX_BITMARK);
+          space((FUTRONIX_INTERVAL) - FUTRONIX_BITMARK); 
+        }
+        
+        bitPosition++; 
+      }
+      
+      //parity bit
+      //DEBUG_PRINTLN("\nparity:"); 
+      if (onesCount %2 == 0) 
+      {
+        mark(FUTRONIX_BITMARK);
+        space((FUTRONIX_INTERVAL * 2) - FUTRONIX_BITMARK); 
+      }
+      else
+      {
+        mark(FUTRONIX_BITMARK);
+        space((FUTRONIX_INTERVAL) - FUTRONIX_BITMARK); 
+      }
+      
+      //footer
+      //DEBUG_PRINTLN("\nfooter:"); 
+      mark(FUTRONIX_BITMARK); 
+      space((FUTRONIX_INTERVAL * 4) - FUTRONIX_BITMARK); 
+      mark(FUTRONIX_BITMARK); 
+  
+      this->pinOff();
+  
+      delay(FUTRONIX_CMD_GAP);  
     }
+    
+    DEBUG_PRINTLN("------------------");
   }
 }
 
@@ -200,7 +215,7 @@ void IRTransmitter::mark(unsigned int usec)
     this->pinOff();
     // e.g. 38 kHz -> T = 26.31 microsec (periodic time), half of it is 13
     delayMicroseconds(_halfPeriodicTime);
-    DEBUG_PRINTLN("one cycle");
+    //DEBUG_PRINTLN("one cycle");
   }
 }
 
@@ -243,182 +258,190 @@ void IRTransmitter::enableIROut(int khz)
   _halfPeriodicTime = 500/khz;
 }
 
-/*---------------------------------------*/
-void IRTransmitter::doSendFutronix(unsigned long command, int headerType, int footerType, bool reverse, int bitmark) {
-  
-  // Set IR carrier frequency
-  enableIROut(38);
-  
-  DEBUG_PRINTLN("Setting scene "); //, bitmark %d, headerType %d, footerType %d", bitmark, headerType, footerType); 
-  DEBUG_PRINTLN(bitmark); 
-  
-  //header
-  #ifdef __DEBUG_PRINT__
-  DEBUG_PRINTLN("\nheader:"); 
-  #endif
-  switch(headerType)
-  {
-    case 0: 
-      mark(bitmark); 
-      space((FUTRONIX_INTERVAL * 4) - bitmark); 
-      mark(bitmark); 
-      space((FUTRONIX_INTERVAL) - bitmark); 
-    break;
-    
-    case 1: 
-      mark(FUTRONIX_INTERVAL * 4); 
-    space(FUTRONIX_INTERVAL); 
-    break;
-  }
-  
-  //body
-  
-  //0
-  mark(bitmark); 
-  space(FUTRONIX_INTERVAL - bitmark); 
-  
-  //0
-  mark(bitmark); 
-  space(FUTRONIX_INTERVAL - bitmark); 
-  
-  //0
-  mark(bitmark); 
-  space(FUTRONIX_INTERVAL - bitmark); 
-  
-  //0
-  mark(bitmark); 
-  space(FUTRONIX_INTERVAL - bitmark); 
-  
-  
+/*
+void IRTransmitter::doSendFutronix_old(unsigned long command, int headerType, int footerType, bool reverse, int bitmark) 
+{
   if (reverse)
+    return; 
+    
+  for(int n=0; n<3; n++)
   {
-    //1
-    mark(bitmark); 
-    space((FUTRONIX_INTERVAL * 2) - bitmark); 
+    // Set IR carrier frequency
+    enableIROut(38);
     
-    //1
-    mark(bitmark); 
-    space((FUTRONIX_INTERVAL * 3) - bitmark); 
+    DEBUG_PRINTLN("Setting scene "); //, bitmark %d, headerType %d, footerType %d", bitmark, headerType, footerType); 
+    DEBUG_PRINTLN(bitmark); 
     
-    //0
-    mark(bitmark); 
-    space(FUTRONIX_INTERVAL - bitmark); 
-    
-    //0
-    mark(bitmark); 
-    space(FUTRONIX_INTERVAL - bitmark); 
-    
-    //1
-    mark(bitmark); 
-    space((FUTRONIX_INTERVAL * 2) - bitmark); 
-    
-    //0
-    mark(bitmark); 
-    space(FUTRONIX_INTERVAL - bitmark); 
-    
-    
-    //parity bit 
-    mark(bitmark); 
-    space((FUTRONIX_INTERVAL * 1) - bitmark); 
-  }
-  else
-  {
-    //0
-    mark(bitmark); 
-    space(FUTRONIX_INTERVAL - bitmark); 
-    
-    //1
-    mark(bitmark); 
-    space((FUTRONIX_INTERVAL * 3) - bitmark); 
-    
-    //0
-    mark(bitmark); 
-    space(FUTRONIX_INTERVAL - bitmark); 
-    
-    //0
-    mark(bitmark); 
-    space(FUTRONIX_INTERVAL - bitmark); 
-    
-    //1
-    mark(bitmark); 
-    space((FUTRONIX_INTERVAL * 2) - bitmark); 
-    
-    //1
-    mark(bitmark); 
-    space((FUTRONIX_INTERVAL * 3) - bitmark); 
-    
-    
-    //parity bit 
-    mark(bitmark); 
-    space((FUTRONIX_INTERVAL * 1) - bitmark); 
-  }
-  
-  /*
-  //body
-  #ifdef __DEBUG_PRINT__
-  DEBUG_PRINTLN("\nbody:"); 
-  #endif
-  int onesCount = 0; 
-  int bitPosition = 1; 
-  int nbits = 10; 
-  for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
-    if (command & mask) {  // 1
-      mark(FUTRONIX_BITMARK);
-    if (bitPosition % 2 == 0)
-    space((FUTRONIX_INTERVAL * 3) - FUTRONIX_BITMARK); 
-    else 
-    space((FUTRONIX_INTERVAL * 2) - FUTRONIX_BITMARK); 
-  
-    onesCount++; 
-    } 
-  else 
-  { // 0
-      mark(FUTRONIX_BITMARK);
-    space((FUTRONIX_INTERVAL) - FUTRONIX_BITMARK); 
+    //header
+    #ifdef __DEBUG_PRINT__
+    DEBUG_PRINTLN("\nheader:"); 
+    #endif
+    switch(headerType)
+    {
+      case 0: 
+        mark(bitmark); 
+        space((FUTRONIX_INTERVAL * 4) - bitmark); 
+        mark(bitmark); 
+        space((FUTRONIX_INTERVAL) - bitmark); 
+      break;
+      
+      case 1: 
+        mark(FUTRONIX_INTERVAL * 4); 
+      space(FUTRONIX_INTERVAL); 
+      break;
     }
-  
-  bitPosition++; 
-  }
-  
-  //parity bit
-  #ifdef __DEBUG_PRINT__
-  DEBUG_PRINTLN("\nparity:"); 
-  #endif
-  if (onesCount %2 == 0) {
-      mark(FUTRONIX_BITMARK);
-    space((FUTRONIX_INTERVAL * 2) - FUTRONIX_BITMARK); 
-  }
-  else{
-      mark(FUTRONIX_BITMARK);
-    space((FUTRONIX_INTERVAL) - FUTRONIX_BITMARK); 
-  }
-  */
-  
-  //footer
-  #ifdef __DEBUG_PRINT__
-  DEBUG_PRINTLN("\nfooter:"); 
-  #endif
-  
-  switch(footerType)
-  {
-    case 0: 
-      mark(bitmark); 
-      space((FUTRONIX_INTERVAL * 4) - bitmark); 
-      mark(bitmark); 
-    break;
     
-    case 1: 
-      space(FUTRONIX_INTERVAL * 4); 
-      mark(bitmark); 
-    break;
+    //body
     
-    case 2: 
-      mark(FUTRONIX_INTERVAL * 4); 
-    break;
+    //0
+    mark(bitmark); 
+    space(FUTRONIX_INTERVAL - bitmark); 
+    
+    //0
+    mark(bitmark); 
+    space(FUTRONIX_INTERVAL - bitmark); 
+    
+    //0
+    mark(bitmark); 
+    space(FUTRONIX_INTERVAL - bitmark); 
+    
+    //0
+    mark(bitmark); 
+    space(FUTRONIX_INTERVAL - bitmark); 
+    
+    
+    if (reverse)
+    {
+      //1
+      mark(bitmark); 
+      space((FUTRONIX_INTERVAL * 2) - bitmark); 
+      
+      //1
+      mark(bitmark); 
+      space((FUTRONIX_INTERVAL * 3) - bitmark); 
+      
+      //0
+      mark(bitmark); 
+      space(FUTRONIX_INTERVAL - bitmark); 
+      
+      //0
+      mark(bitmark); 
+      space(FUTRONIX_INTERVAL - bitmark); 
+      
+      //1
+      mark(bitmark); 
+      space((FUTRONIX_INTERVAL * 2) - bitmark); 
+      
+      //0
+      mark(bitmark); 
+      space(FUTRONIX_INTERVAL - bitmark); 
+      
+      
+      //parity bit 
+      mark(bitmark); 
+      space((FUTRONIX_INTERVAL * 1) - bitmark); 
+    }
+    else
+    {
+      //0
+      mark(bitmark); 
+      space(FUTRONIX_INTERVAL - bitmark); 
+      
+      //1
+      mark(bitmark); 
+      space((FUTRONIX_INTERVAL * 3) - bitmark); 
+      
+      //0
+      mark(bitmark); 
+      space(FUTRONIX_INTERVAL - bitmark); 
+      
+      //0
+      mark(bitmark); 
+      space(FUTRONIX_INTERVAL - bitmark); 
+      
+      //1
+      mark(bitmark); 
+      space((FUTRONIX_INTERVAL * 2) - bitmark); 
+      
+      //1
+      mark(bitmark); 
+      space((FUTRONIX_INTERVAL * 3) - bitmark); 
+      
+      
+      //parity bit 
+      mark(bitmark); 
+      space((FUTRONIX_INTERVAL * 1) - bitmark); 
+    }
+    
+    /*
+    //body
+    #ifdef __DEBUG_PRINT__
+    DEBUG_PRINTLN("\nbody:"); 
+    #endif
+    int onesCount = 0; 
+    int bitPosition = 1; 
+    int nbits = 10; 
+    for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1) {
+      if (command & mask) {  // 1
+        mark(FUTRONIX_BITMARK);
+      if (bitPosition % 2 == 0)
+      space((FUTRONIX_INTERVAL * 3) - FUTRONIX_BITMARK); 
+      else 
+      space((FUTRONIX_INTERVAL * 2) - FUTRONIX_BITMARK); 
+    
+      onesCount++; 
+      } 
+    else 
+    { // 0
+        mark(FUTRONIX_BITMARK);
+      space((FUTRONIX_INTERVAL) - FUTRONIX_BITMARK); 
+      }
+    
+    bitPosition++; 
+    }
+    
+    //parity bit
+    #ifdef __DEBUG_PRINT__
+    DEBUG_PRINTLN("\nparity:"); 
+    #endif
+    if (onesCount %2 == 0) {
+        mark(FUTRONIX_BITMARK);
+      space((FUTRONIX_INTERVAL * 2) - FUTRONIX_BITMARK); 
+    }
+    else{
+        mark(FUTRONIX_BITMARK);
+      space((FUTRONIX_INTERVAL) - FUTRONIX_BITMARK); 
+    }
+    -/
+    
+    //footer
+    #ifdef __DEBUG_PRINT__
+    DEBUG_PRINTLN("\nfooter:"); 
+    #endif
+    
+    switch(footerType)
+    {
+      case 0: 
+        mark(bitmark); 
+        space((FUTRONIX_INTERVAL * 4) - bitmark); 
+        mark(bitmark); 
+      break;
+      
+      case 1: 
+        space(FUTRONIX_INTERVAL * 4); 
+        mark(bitmark); 
+      break;
+      
+      case 2: 
+        mark(FUTRONIX_INTERVAL * 4); 
+      break;
+    }
+    this->pinOff();
+
+    delay(102);  
+    //DEBUG_PRINTLN("------------------");
   }
-  this->pinOff();
-  
-  DEBUG_PRINTLN("------------------");
 }
+*/
 
 #endif

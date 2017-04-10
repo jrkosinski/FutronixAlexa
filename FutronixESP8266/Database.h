@@ -5,12 +5,15 @@
 #include "EEPROMInterface.h"
 
 #define RECORD_FIXED_SIZE   50
-#define MAX_SCENES          12
-#define EXTRA_RECORDS       2
+#define MAX_SCENES          5
+#define EXTRA_RECORDS       3
 #define TOTAL_DB_SIZE       ((RECORD_FIXED_SIZE * MAX_SCENES) + (EXTRA_RECORDS * RECORD_FIXED_SIZE))
 
 #define WIFI_SSID_RECORD_INDEX    0
 #define WIFI_PASSWD_RECORD_INDEX  1
+#define MAGIC_WORD_RECORD_INDEX 2
+
+#define MAGIC_WORD "Futronix:012345678998765432102017:Futronix" 
 
 
 //TODO: This should be refactored to allow for easier storage of all different kinds of records 
@@ -62,6 +65,7 @@ class Database
     DatabaseRecord _allRecords[MAX_SCENES];
     DatabaseRecord _wifiSsid;
     DatabaseRecord _wifiPasswd;
+    DatabaseRecord _magicWord;
   
   public: 
     Database(); 
@@ -69,6 +73,7 @@ class Database
     unsigned int getRecordCount(); 
     char* getWifiSsid();
     char* getWifiPasswd(); 
+    bool hasBeenSetUp(); 
     void setWifiSsid(const char* data);
     void setWifiPasswd(const char* data); 
 
@@ -113,7 +118,7 @@ class Database
      */
     void setWifiData(const char* ssid, const char* passwd);
     
-    void test(); 
+    void debugDump(); 
 };
 /****************************************/
 
@@ -153,19 +158,27 @@ char* Database::getWifiPasswd()
 }
 
 /*---------------------------------------*/
+bool Database::hasBeenSetUp()
+{
+  return (strcmp(MAGIC_WORD, this->_magicWord.getData()) == 0);
+}
+
+/*---------------------------------------*/
 void Database::setWifiSsid(const char* data)
 {
   this->_wifiSsid.setData(data);
-  if (this->_enabled)
-    this->_eeprom.writeString(this->_wifiSsid.getData(), (MAX_SCENES + WIFI_SSID_RECORD_INDEX) * RECORD_FIXED_SIZE); 
+  DEBUG_PRINTLN(String("wifi ssid:") + this->_wifiSsid.getData()); 
+  //if (this->_enabled)
+  //  this->_eeprom.writeString(this->_wifiSsid.getData(), (MAX_SCENES + WIFI_SSID_RECORD_INDEX) * RECORD_FIXED_SIZE); 
 }
 
 /*---------------------------------------*/
 void Database::setWifiPasswd(const char* data)
 {
   this->_wifiPasswd.setData(data);
-  if (this->_enabled)
-    this->_eeprom.writeString(this->_wifiPasswd.getData(), (MAX_SCENES + WIFI_PASSWD_RECORD_INDEX) * RECORD_FIXED_SIZE); 
+  DEBUG_PRINTLN(String("wifi passwd:") + this->_wifiPasswd.getData()); 
+  //if (this->_enabled)
+  //  this->_eeprom.writeString(this->_wifiPasswd.getData(), (MAX_SCENES + WIFI_PASSWD_RECORD_INDEX) * RECORD_FIXED_SIZE); 
 }
 
 /*---------------------------------------*/
@@ -238,7 +251,7 @@ DatabaseRecord* Database::getAllRecords()
     this->_allRecords[n].setData(pBuf); 
     pBuf += (RECORD_FIXED_SIZE * sizeof(char)); 
     
-    DEBUG_PRINTLN(String(this->_allRecords[n].Index) + ":" + this->_allRecords[n].getData()); 
+    //DEBUG_PRINTLN(String(this->_allRecords[n].Index) + ":" + this->_allRecords[n].getData()); 
   }
 
   for(int n=0; n<EXTRA_RECORDS; n++)
@@ -247,10 +260,13 @@ DatabaseRecord* Database::getAllRecords()
       _wifiSsid.setData(pBuf); 
     else if (n == WIFI_PASSWD_RECORD_INDEX)
       _wifiPasswd.setData(pBuf);
+    else if (n == MAGIC_WORD_RECORD_INDEX)
+      _magicWord.setData(pBuf);
       
     pBuf += (RECORD_FIXED_SIZE * sizeof(char)); 
   }
-  
+
+  this->debugDump();
   return this->_allRecords; 
 }
 
@@ -301,12 +317,16 @@ void Database::save()
     pBuf += (RECORD_FIXED_SIZE * sizeof(char)); 
   }
 
+  this->_magicWord.setData(MAGIC_WORD);
+  
   for(int n=0; n<EXTRA_RECORDS; n++)
   {
     if (n == WIFI_SSID_RECORD_INDEX)
-      memcpy(pBuf, this->_allRecords[n].getData(), RECORD_FIXED_SIZE); 
+      memcpy(pBuf, this->_wifiSsid.getData(), RECORD_FIXED_SIZE); 
     else if (n == WIFI_PASSWD_RECORD_INDEX)
-      memcpy(pBuf, this->_allRecords[n].getData(), RECORD_FIXED_SIZE); 
+      memcpy(pBuf, this->_wifiPasswd.getData(), RECORD_FIXED_SIZE); 
+    else if (n == MAGIC_WORD_RECORD_INDEX)
+      memcpy(pBuf, this->_magicWord.getData(), RECORD_FIXED_SIZE); 
       
     pBuf += (RECORD_FIXED_SIZE * sizeof(char)); 
   }
@@ -315,17 +335,13 @@ void Database::save()
 }
 
 /*---------------------------------------*/
-void Database::test()
+void Database::debugDump()
 {
-  this->_eeprom.clear(); 
-  delay(1000); 
-  this->_eeprom.writeString("this is a string"); 
-  delay(1000); 
+  for(int n=0; n<MAX_SCENES; n++)
+    DEBUG_PRINTLN(String(this->_allRecords[n].Index) + ":" + this->_allRecords[n].getData()); 
 
-  char buffer[512]; 
-  this->_eeprom.readAllString(buffer); 
-  DEBUG_PRINTLN(buffer); 
-  delay(1000); 
+  DEBUG_PRINTLN(String("wifi: ") + this->_wifiSsid.getData() + "  " + this->_wifiPasswd.getData()); 
+  DEBUG_PRINTLN(String("magic number: ") + this->_magicWord.getData()); 
 }
 
 

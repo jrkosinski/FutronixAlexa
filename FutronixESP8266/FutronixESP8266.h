@@ -45,6 +45,12 @@ class FutronixESP8266
     void loop();
 
     /***
+     * returns a value indicating whether the DB on the chip 
+     * has been initialized or not
+     */
+    bool hasBeenSetUp();
+
+    /***
      * does initial setup of DB & chip 
      */
     void setup(const char* wifiSsid, const char* wifiPasswd, bool clearDatabase); 
@@ -96,6 +102,12 @@ FutronixESP8266::FutronixESP8266()
 }
 
 /*---------------------------------------*/
+bool FutronixESP8266::hasBeenSetUp()
+{
+  return this->_db->hasBeenSetUp();
+}
+
+/*---------------------------------------*/
 void FutronixESP8266::begin()
 {
   DEBUG_PRINTLN("Futronix:begin"); 
@@ -105,9 +117,8 @@ void FutronixESP8266::begin()
   this->_command->begin();
   this->_db->begin(); 
 
-  this->_db->setRecord(0, "");
-  this->_db->setRecord(2, "");
-  //this->_db->getAllRecords();
+  if (!this->_db->hasBeenSetUp())
+    this->setup("mina", "HappyTime", true);
 
   if (this->_wifi->connect())
   {
@@ -125,6 +136,7 @@ void FutronixESP8266::loop()
 /*---------------------------------------*/
 void FutronixESP8266::setup(const char* wifiSsid, const char* wifiPasswd, bool clearDatabase)
 {
+  DEBUG_PRINTLN(String("Futronix:setup ") + wifiSsid + "  " + wifiPasswd); 
   //clear database 
   if (clearDatabase)
   {
@@ -134,6 +146,8 @@ void FutronixESP8266::setup(const char* wifiSsid, const char* wifiPasswd, bool c
   //set wifi name & passwd
   this->_db->setWifiSsid(wifiSsid);
   this->_db->setWifiPasswd(wifiPasswd);
+
+  this->_db->save();
 }
 
 /*---------------------------------------*/
