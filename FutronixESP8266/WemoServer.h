@@ -108,6 +108,7 @@ void WemoServer::respondToSearch(IPAddress& senderIP, unsigned int senderPort)
     "USN: uuid:" + this->_uuid + "::urn:Belkin:device:**\r\n"
     "X-User-Agent: redsonic\r\n\r\n";
 
+  DEBUG_PRINTLN(String("Sending response to ") + senderIP.toString() + " at port " + senderPort + " from " + localIP.toString()); 
   this->_udp.beginPacket(senderIP, senderPort);
   this->_udp.write(response.c_str());
   this->_udp.endPacket();
@@ -137,6 +138,11 @@ void WemoServer::startWebServer()
   Serial.printf("settings heap size: %u\n", ESP.getFreeHeap());
   this->_server = new ESP8266WebServer(this->_localPort);
 
+  this->_server->on("/index.html", [&]() {
+    DEBUG_PRINTLN("index.html");
+    this->_server->send(200, "text/plain", "Hello World!");
+  });
+    
   this->_server->on("/", [&]() {
     this->handleRoot();
   });
@@ -211,14 +217,16 @@ void WemoServer::handleUpnpControl()
   DEBUG_PRINT("request:");
   DEBUG_PRINTLN(request);
 
-  if(request.indexOf("<BinaryState>1</BinaryState>") > 0) {
-      DEBUG_PRINTLN("Got Turn on request");
-      this->_callbackHandler->handleCallback(1);
+  if(request.indexOf("<BinaryState>1</BinaryState>") > 0) 
+  {
+    DEBUG_PRINTLN("Got Turn on request");
+    this->_callbackHandler->handleCallback(1);
   }
 
-  if(request.indexOf("<BinaryState>0</BinaryState>") > 0) {
-      DEBUG_PRINTLN("Got Turn off request");
-      this->_callbackHandler->handleCallback(0);
+  if(request.indexOf("<BinaryState>0</BinaryState>") > 0) 
+  {
+    DEBUG_PRINTLN("Got Turn off request");
+    this->_callbackHandler->handleCallback(0);
   }
 
   DEBUG_PRINTLN("Responding to Control request");
@@ -264,10 +272,9 @@ void WemoServer::handleSetupXml()
         "</root>\r\n"
         "\r\n";
 
-  this->_server->send(200, "text/xml", setupXml.c_str());
-
-  DEBUG_PRINT("Sending :");
+  DEBUG_PRINT("Sending:");
   DEBUG_PRINTLN(setupXml);
+  this->_server->send(200, "text/xml", setupXml.c_str());
 }
 
 #endif

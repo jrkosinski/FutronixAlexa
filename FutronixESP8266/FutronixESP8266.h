@@ -130,7 +130,7 @@ void FutronixESP8266::begin()
 /*---------------------------------------*/
 void FutronixESP8266::loop()
 {
-  //this->_wemo->listen();
+  this->_wemo->listen();
 }
 
 /*---------------------------------------*/

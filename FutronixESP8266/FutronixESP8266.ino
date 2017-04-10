@@ -41,13 +41,13 @@ IRTransmitter ir;
 /*---------------------------------------*/
 void loop()
 {
-  //futronix.loop();
   if (!_ranOnce)
   {
     runOnce();
     _ranOnce = true;
   }
   
+  futronix.loop();
   //adminServer.listen();
 
 /*
@@ -62,22 +62,6 @@ void loop()
 /*---------------------------------------*/
 void runOnce()
 {
-  //WiFiClient client; 
-  //if (client.connect("192.168.1.38", 1000))
-  //  Serial.println("CONNECTED");
-  
-  //delay(1000); 
-  //ir.test(3);
-
-/*
-  delay(3000); 
-  for(int n=-1; n<20; n++)
-  {
-    futronix.setScene(n); 
-    delay(3000); 
-  }
-  futronix.setScene(255); 
-  */
 }
 
 

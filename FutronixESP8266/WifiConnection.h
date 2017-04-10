@@ -54,21 +54,38 @@ bool WifiConnection::connect()
 {
   DEBUG_PRINTLN(String("Wifi:connect ") + this->_wifiSsid + " / " + this->_wifiPasswd); 
   
-  /*
+  boolean state = true;
+  int i = 0;
+  
   WiFi.mode(WIFI_STA);
   WiFi.begin(this->_wifiSsid, this->_wifiPasswd);
-  
-  DEBUG_PRINTLN ("connecting to wifi");
+
+  // Wait for connection
+  DEBUG_PRINTLN("Wifi:Connecting ...");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     DEBUG_PRINT(".");
+    if (i > 10){
+      state = false;
+      break;
+    }
+    i++;
   }
-  DEBUG_PRINTLN ("Wifi:connected");
-  DEBUG_PRINT("Wifi:IP address: ");
-  DEBUG_PRINTLN(WiFi.localIP().toString().c_str());
 
-  */
+  DEBUG_PRINTLN(""); 
+  if (state){
+    DEBUG_PRINT(this->_wifiSsid);
+    DEBUG_PRINT("  IP address: ");
+    DEBUG_PRINTLN(WiFi.localIP());
+  }
+  else {
+    DEBUG_PRINTLN("Connection failed.");
+  }
   
+  this->isConnected = state;
+
+  
+  /*
   this->_wiFiMulti.addAP(this->_wifiSsid, this->_wifiPasswd);
     
   DEBUG_PRINTLN ("connecting to wifi");
@@ -77,9 +94,9 @@ bool WifiConnection::connect()
     DEBUG_PRINT (".");
   }
   DEBUG_PRINTLN ("\nconnected");
+  */
 
-  this->isConnected = true; 
-  return true;
+  return this->isConnected;
 }
 
 
