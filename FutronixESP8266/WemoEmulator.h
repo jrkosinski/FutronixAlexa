@@ -8,9 +8,189 @@
 #include <functional> 
 
 #include "WemoServer.h"
+#include "Fauxmo.h"
+#include "CommandInterface.h"
 
 #define SERVER_COUNT_LIMIT 40
 
+//#define __OLD_VERSION__
+#ifndef __OLD_VERSION__
+
+/****************************************
+ * WemoEmulator
+ * ------------
+ * Handles the wemo-emulating servers, and also the initial UDP request 
+ * from the Alexa, scanning for devices on the network. 
+ */
+class WemoEmulator
+{
+  private:
+    int _serverCount;
+    bool _enabled = false; 
+    fauxmoESP _fauxmo; 
+    
+  public:
+    bool isRunning; 
+    
+  public:
+    WemoEmulator();
+    ~WemoEmulator();
+
+    void begin();
+    void listen();
+    void stop();
+    bool addDevice(const char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler);
+    bool replaceDevice(const char* deviceName, const char* newDeviceName, IWemoCallbackHandler* callbackHandler);
+    int getDeviceIndexByName(const char* deviceName);
+};
+/****************************************/
+
+/*---------------------------------------*/
+WemoEmulator::WemoEmulator()
+{
+  this->_serverCount = 0;
+  this->isRunning = false;
+}
+
+/*---------------------------------------*/
+WemoEmulator::~WemoEmulator()
+{
+}
+
+/*---------------------------------------*/
+void WemoEmulator::begin()
+{
+  this->isRunning = false;
+  this->_enabled = true; 
+  
+  DEBUG_PRINTLN("WemoEmulator:begin");
+
+  this->_fauxmo.addDevice("scene one"); 
+  this->_fauxmo.addDevice("scene two"); 
+  this->_fauxmo.addDevice("scene three"); 
+  this->_fauxmo.addDevice("scene four"); 
+  this->_fauxmo.addDevice("scene five"); 
+  this->_fauxmo.addDevice("scene six"); 
+  this->_fauxmo.addDevice("scene seven"); 
+  this->_fauxmo.addDevice("scene eight"); 
+  this->_fauxmo.addDevice("scene nine"); 
+  this->_fauxmo.addDevice("scene ten"); 
+  this->_fauxmo.addDevice("scene eleven"); 
+  this->_fauxmo.addDevice("scene twelve"); 
+  this->_fauxmo.addDevice("scene thirteen"); 
+  this->_fauxmo.addDevice("scene fourteen"); 
+  this->_fauxmo.addDevice("scene fifteen"); 
+  this->_fauxmo.addDevice("scene sixteen"); 
+  this->_fauxmo.addDevice("scene seventeen"); 
+  this->_fauxmo.addDevice("scene eighteen"); 
+  this->_fauxmo.addDevice("scene nineteen"); 
+ 
+  
+  this->_fauxmo.onMessage([](unsigned char device_id, const char * device_name, bool state) {
+    Serial.printf("[MAIN] Device #%d (%s) state: %s\n", device_id, device_name, state ? "ON" : "OFF");
+
+        if (strcmp(device_name, "scene one") == 0)
+        {
+          DEBUG_PRINTLN("Alexa scene 1"); 
+          CommandInterface::setSceneStatic(1);
+        }
+        if (strcmp(device_name, "scene two") == 0)
+        {
+          DEBUG_PRINTLN("Alexa scene 2"); 
+          CommandInterface::setSceneStatic(2);
+        }
+        if (strcmp(device_name, "scene three") == 0)
+        {
+          DEBUG_PRINTLN("Alexa scene 3"); 
+          CommandInterface::setSceneStatic(3);
+        }
+        if (strcmp(device_name, "scene four") == 0)
+        {
+          DEBUG_PRINTLN("Alexa scene 4"); 
+          CommandInterface::setSceneStatic(4);
+        }
+        if (strcmp(device_name, "scene five") == 0)
+        {
+          DEBUG_PRINTLN("Alexa scene 5"); 
+          CommandInterface::setSceneStatic(5);
+        }
+        if (strcmp(device_name, "scene six") == 0)
+        {
+          DEBUG_PRINTLN("Alexa scene 6"); 
+          CommandInterface::setSceneStatic(6);
+        }
+        if (strcmp(device_name, "scene seven") == 0)
+        {
+          DEBUG_PRINTLN("Alexa scene 7"); 
+          CommandInterface::setSceneStatic(7);
+        }
+    });
+}
+
+/*---------------------------------------*/
+void WemoEmulator::listen()
+{
+  if (!this->_enabled)
+    return; 
+
+  this->_fauxmo.handle();
+}
+
+/*---------------------------------------*/
+void WemoEmulator::stop()
+{
+}
+
+/*---------------------------------------*/
+bool WemoEmulator::addDevice(const char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler)
+{
+  if (!this->_enabled)
+    return false; 
+}
+
+/*---------------------------------------*/
+bool WemoEmulator::replaceDevice(const char* deviceName, const char* newDeviceName, IWemoCallbackHandler* callbackHandler)
+{
+  if (!this->_enabled)
+    return false; 
+    
+  return false;
+}
+
+/*---------------------------------------*/
+int WemoEmulator::getDeviceIndexByName(const char* deviceName)
+{
+  return -1; 
+}
+
+#endif 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifdef __OLD_VERSION__
 /****************************************
  * WemoEmulator
  * ------------
@@ -202,5 +382,7 @@ int WemoEmulator::getDeviceIndexByName(const char* deviceName)
   
   return -1; 
 }
+
+#endif
 
 #endif

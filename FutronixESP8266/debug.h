@@ -78,7 +78,7 @@ void debugPrintln(int n)
 void debugShowHeap()
 {
 #ifdef DEBUG
-  DEBUG_SHOWHEAP; 
+  DEBUG_PRINTLN(String("HEAP: ") + ESP.getFreeHeap()); 
 #endif
 }
 

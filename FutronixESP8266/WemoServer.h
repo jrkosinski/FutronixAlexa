@@ -27,7 +27,7 @@ class IWemoCallbackHandler
 class WemoServer
 {
   private:
-    const char* _deviceName;
+    char _deviceName[70];
     int _localPort;
     IWemoCallbackHandler* _callbackHandler;
     String _uuid;
@@ -59,7 +59,7 @@ class WemoServer
 /*---------------------------------------*/
 WemoServer::WemoServer(const char* deviceName, int localPort, IWemoCallbackHandler* callbackHandler)
 {
-  this->_deviceName = deviceName;
+  strcpy(this->_deviceName, deviceName);
   this->_localPort = localPort;
   this->_callbackHandler = callbackHandler;
   
@@ -80,6 +80,7 @@ WemoServer::WemoServer(const char* deviceName, int localPort, IWemoCallbackHandl
 WemoServer::~WemoServer()
 {
   delete this->_callbackHandler;
+  delete this->_server;
 }
 
 /*---------------------------------------*/
@@ -109,6 +110,7 @@ void WemoServer::respondToSearch(IPAddress& senderIP, unsigned int senderPort)
     "X-User-Agent: redsonic\r\n\r\n";
 
   DEBUG_PRINTLN(String("Sending response to ") + senderIP.toString() + " at port " + senderPort + " from " + localIP.toString()); 
+  DEBUG_PRINTLN(response); 
   this->_udp.beginPacket(senderIP, senderPort);
   this->_udp.write(response.c_str());
   this->_udp.endPacket();
@@ -136,8 +138,9 @@ void WemoServer::stop()
 /*---------------------------------------*/
 void WemoServer::startWebServer()
 {
+  DEBUG_SHOWHEAP;
   this->_server = new ESP8266WebServer(this->_localPort);
-  DEBUG_SHOWHEAP();
+  DEBUG_SHOWHEAP;
 
   this->_server->on("/index.html", [&]() {
     DEBUG_PRINTLN("index.html");
@@ -162,6 +165,7 @@ void WemoServer::startWebServer()
 
   //this->_server->onNotFound(handleNotFound);
   this->_server->begin();
+  DEBUG_SHOWHEAP;
 
   DEBUG_PRINTLN("WebServer started on port: ");
   DEBUG_PRINTLN(_localPort);

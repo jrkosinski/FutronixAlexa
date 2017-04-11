@@ -24,9 +24,11 @@ class CommandInterface
     void begin(); 
     void test(); 
     void setScene(int scene); 
+    static void setSceneStatic(int scene); 
 };
 /****************************************/
 
+CommandInterface _globalInstance;
 
 /*---------------------------------------*/
 CommandInterface::CommandInterface()
@@ -39,22 +41,20 @@ void CommandInterface::begin()
   DEBUG_PRINTLN("CommandInterface:begin"); 
   this->_enabled = true; 
   this->_irTransmitter.begin();
+  _globalInstance._irTransmitter.begin();
+  _globalInstance._enabled = true; 
 }
 
 /*---------------------------------------*/
 void CommandInterface::test()
 {
-  if (this->_enabled)
-  {
-    DEBUG_PRINTLN("CommandInterface:test"); 
-  }
+  DEBUG_PRINTLN("CommandInterface:test"); 
 }
 
 /*---------------------------------------*/
 void CommandInterface::setScene(int scene)
 {
-  if (this->_enabled)
-  {
+  DEBUG_PRINTLN(String("CommandInterface:set scene") + scene); 
     unsigned short command = 0; 
     if (scene >=0 && scene < 20)
     {
@@ -70,7 +70,12 @@ void CommandInterface::setScene(int scene)
 
     if (command != 0)
       this->_irTransmitter.sendFutronix(command); 
-  }
+}
+
+/*---------------------------------------*/
+void CommandInterface::setSceneStatic(int scene)
+{
+  _globalInstance.setScene(scene);
 }
 
 #endif

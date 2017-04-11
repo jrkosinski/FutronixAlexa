@@ -112,7 +112,7 @@ void FutronixESP8266::begin()
 {
   DEBUG_PRINTLN("Futronix:begin"); 
   
-  this->_led->begin();
+  //this->_led->begin();
   this->_wifi->begin();
   this->_command->begin();
   this->_db->begin(); 
@@ -204,17 +204,23 @@ void FutronixESP8266::startWemoServers()
   //read all records from EEPROM
   DatabaseRecord* records = this->_db->getAllRecords(); 
 
+  this->_wemo->addDevice("scene one", 80, new SceneNumberCallbackHandler(this->_command, 0)); 
+  this->_wemo->addDevice("scene two", 81, new SceneNumberCallbackHandler(this->_command, 1)); 
+  this->_wemo->addDevice("scene three", 82, new SceneNumberCallbackHandler(this->_command, 2)); 
+/*
   //add wemo server/listeners for every scene & scene name 
   for(int n=0; n<this->_db->getRecordCount(); n++)
   {
     //scene numbers 
-    this->_wemo->addDevice((String("scene ") + String(n+1)).c_str(), baseNumberPort+n, new SceneNumberCallbackHandler(this->_command, n));
+    this->_wemo->addDevice(String("scene ") + numbers[n], baseNumberPort+n, new SceneNumberCallbackHandler(this->_command, n));
 
     //scene names 
     if (strlen(records[n].getData()) > 0)
       this->_wemo->addDevice(records[n].getData(), baseNamePort+n, new SceneNameCallbackHandler(this->_command, this->_db, records[n].getData())); 
   }
+  */
 }
+
 
 #endif
 

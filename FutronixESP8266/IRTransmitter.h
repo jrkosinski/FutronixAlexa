@@ -105,8 +105,8 @@ void IRTransmitter::test(int repeat)
 /*---------------------------------------*/
 void IRTransmitter::sendFutronix(unsigned short command) 
 {
-  if (this->_enabled)
-  {
+    this->enableIROut(38); 
+    
     //reverse the 6 command bits
     bool commandBits[6]; 
     int nbits = 6; 
@@ -130,11 +130,8 @@ void IRTransmitter::sendFutronix(unsigned short command)
       
     DEBUG_PRINTLN("Setting scene "); //, bitmark %d, headerType %d, footerType %d", bitmark, headerType, footerType); 
     
-    for(int i=0; i<2; i++)
+    for(int i=0; i<3; i++)
     {
-      // Set IR carrier frequency
-      enableIROut(38);
-      
       //DEBUG_PRINTLN(FUTRONIX_BITMARK); 
       
       //header
@@ -199,7 +196,6 @@ void IRTransmitter::sendFutronix(unsigned short command)
     }
     
     DEBUG_PRINTLN("------------------");
-  }
 }
 
 /*---------------------------------------*/
