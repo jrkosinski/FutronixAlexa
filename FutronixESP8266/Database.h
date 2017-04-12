@@ -3,6 +3,7 @@
 #define __DATABASE_H__
 
 #include "EEPROMInterface.h"
+#include "EEPromDatabase.h"
 
 #define RECORD_FIXED_SIZE   50
 #define MAX_SCENES          5

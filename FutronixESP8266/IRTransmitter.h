@@ -21,7 +21,6 @@ class IRTransmitter
 
   public:
     IRTransmitter();
-    ~IRTransmitter();
 
     void begin();   
     void test(int repeat);
@@ -77,11 +76,6 @@ IRTransmitter::IRTransmitter()
 {
   this->_pin = IR_PIN; 
   this->_enabled = false; 
-}
-
-/*---------------------------------------*/
-IRTransmitter::~IRTransmitter()
-{
 }
 
 /*---------------------------------------*/
