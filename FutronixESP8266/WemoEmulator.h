@@ -27,7 +27,7 @@ class WemoEmulator
   private:
     int _serverCount;
     bool _enabled = false; 
-    fauxmoESP _fauxmo; 
+    Fauxmo _fauxmo; 
     
   public:
     bool isRunning; 
