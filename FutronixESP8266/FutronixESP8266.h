@@ -87,6 +87,8 @@ class FutronixESP8266
      */
     void restartWemoServers();    
 
+    void queueSetScene(int scene); 
+
   private:
     void startWemoServers();
 };
@@ -206,12 +208,12 @@ void FutronixESP8266::startWemoServers()
 
   for(int n=0; n<this->_db->getSceneCount(); n++)
   {
-    this->_wemo->addDevice(this->_scenes[n], 0, new SceneNumberCallbackHandler(this->_command, n)); 
+    this->_wemo->addDevice(this->_scenes[n], 0, new SceneCallbackHandler(n)); 
   }
   
   //read all records from EEPROM
-  //this->_wemo->addDevice("scene one", 80, new SceneNumberCallbackHandler(this->_command, 0)); 
-  //this->_wemo->addDevice("scene two", 81, new SceneNumberCallbackHandler(this->_command, 1)); 
+  //this->_wemo->addDevice("scene one", 80, new SceneCallbackHandler(this->_command, 0)); 
+  //this->_wemo->addDevice("scene two", 81, new SceneCallbackHandler(this->_command, 1)); 
 
 /*
   //add wemo server/listeners for every scene & scene name 
@@ -227,6 +229,10 @@ void FutronixESP8266::startWemoServers()
   */
 }
 
+/*---------------------------------------*/
+void FutronixESP8266::queueSetScene(int scene)
+{
+}
 
 
 #endif

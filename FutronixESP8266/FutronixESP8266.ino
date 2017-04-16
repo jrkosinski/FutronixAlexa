@@ -58,22 +58,11 @@ void loop()
     SCENE_TO_SET = -1; 
     futronix.setScene(scene); 
   }
-
-/*
-  LEDOutput led; 
-  led.begin(); 
-  led.blink(10); 
-  led.off(); 
-  delay(3000); 
-  */
 }
 
 /*---------------------------------------*/
 void runOnce()
 {
-  delay(10000); 
-  CommandInterface::setSceneStatic(2);
-  delay(10000); 
 }
 
 

@@ -6,35 +6,16 @@
 #include "Database.h"
 
 /****************************************
- * SceneNumberCallbackHandler
- * --------------------------
+ * SceneCallbackHandler
+ * --------------------
  */
-class SceneNumberCallbackHandler : public IWemoCallbackHandler 
+class SceneCallbackHandler : public IWemoCallbackHandler 
 {
   private: 
     int _sceneNo; 
-    CommandInterface* _command; 
     
   public: 
-    SceneNumberCallbackHandler(CommandInterface* command, int sceneNo); 
-
-    virtual void handleCallback(int param); 
-}; 
-/****************************************/
-
-/****************************************
- * SceneNameCallbackHandler
- * ------------------------
- */
-class SceneNameCallbackHandler : public IWemoCallbackHandler 
-{
-  private: 
-    char* _sceneName; 
-    Database* _db; 
-    CommandInterface* _command; 
-    
-  public: 
-    SceneNameCallbackHandler(CommandInterface* command, Database* dbManager, char* sceneName); 
+    SceneCallbackHandler(int sceneNo); 
 
     virtual void handleCallback(int param); 
 }; 
@@ -42,40 +23,17 @@ class SceneNameCallbackHandler : public IWemoCallbackHandler
 
 
 /*---------------------------------------*/
-SceneNumberCallbackHandler::SceneNumberCallbackHandler(CommandInterface* command, int sceneNo)
+SceneCallbackHandler::SceneCallbackHandler(int sceneNo)
 {
   this->_sceneNo = sceneNo;
-  this->_command = command; 
 }
 
 /*---------------------------------------*/
-void SceneNumberCallbackHandler::handleCallback(int param)
+void SceneCallbackHandler::handleCallback(int param)
 {
   if (param)
   {
-    SCENE_TO_SET = this->_sceneNo;
-    //this->_command->setScene(this->_sceneNo); 
-  }
-}
-
-/*---------------------------------------*/
-SceneNameCallbackHandler::SceneNameCallbackHandler(CommandInterface* command, Database* dbManager, char* sceneName)
-{
-  this->_sceneName = _sceneName;
-  this->_db = dbManager; 
-  this->_command = command; 
-}
-
-/*---------------------------------------*/
-void SceneNameCallbackHandler::handleCallback(int param)
-{
-  if (param)
-  {    
-    int sceneNo = this->_db->getSceneNumber(this->_sceneName); 
-    if (sceneNo >= 0)
-    {
-      this->_command->setScene(sceneNo); 
-    }
+    CommandInterface::setSceneOnMainThread(this->_sceneNo); 
   }
 }
 

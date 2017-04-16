@@ -24,11 +24,10 @@ class CommandInterface
     void begin(); 
     void test(); 
     void setScene(int scene); 
-    static void setSceneStatic(int scene); 
+    static void setSceneOnMainThread(int scene); 
 };
 /****************************************/
 
-CommandInterface _globalInstance;
 
 /*---------------------------------------*/
 CommandInterface::CommandInterface()
@@ -41,8 +40,6 @@ void CommandInterface::begin()
   DEBUG_PRINTLN("CommandInterface:begin"); 
   this->_enabled = true; 
   this->_irTransmitter.begin();
-  _globalInstance._irTransmitter.begin();
-  _globalInstance._enabled = true; 
 }
 
 /*---------------------------------------*/
@@ -55,27 +52,28 @@ void CommandInterface::test()
 void CommandInterface::setScene(int scene)
 {
   DEBUG_PRINTLN(String("CommandInterface:set scene ") + scene); 
-    unsigned short command = 0; 
-    if (scene >=0 && scene < 20)
-    {
-      command = this->_commands[scene]; 
-    }
-    else
-    {
-      if (scene == -1)
-        command = 0x02; 
-      else if (scene = 255)
-        command = 0x3f; 
-    }
+  unsigned short command = 0; 
+  if (scene >=0 && scene < 20)
+  {
+    command = this->_commands[scene]; 
+  }
+  else
+  {
+    if (scene == -1)
+      command = 0x02; 
+    else if (scene = 255)
+      command = 0x3f; 
+  }
 
-    if (command != 0)
-      this->_irTransmitter.sendFutronix(command); 
+  if (command != 0)
+    this->_irTransmitter.sendFutronix(command); 
 }
 
 /*---------------------------------------*/
-void CommandInterface::setSceneStatic(int scene)
+void CommandInterface::setSceneOnMainThread(int scene)
 {
-  _globalInstance.setScene(scene);
+  //TODO: don't do it this way
+  SCENE_TO_SET = scene;
 }
 
 #endif
