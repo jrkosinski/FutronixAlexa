@@ -23,11 +23,15 @@ class DatabaseEntry
     int fixedSize = 10; 
     bool initialized = false;
 
+    DatabaseEntry() { }
     DatabaseEntry(int index, int fixedSize) { 
       this->index = index;
-      this->fixedSize = fixedSize;   
+      this->fixedSize = fixedSize;         
     }
-    ~DatabaseEntry() { delete _data;}    
+    ~DatabaseEntry() { 
+      if (_data != NULL)
+        delete _data;
+    }    
     
     DatabaseEntry(int index, int fixedSize, const char* data) { 
       this->index = index;
