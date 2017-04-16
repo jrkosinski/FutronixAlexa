@@ -54,7 +54,7 @@ void CommandInterface::test()
 /*---------------------------------------*/
 void CommandInterface::setScene(int scene)
 {
-  DEBUG_PRINTLN(String("CommandInterface:set scene") + scene); 
+  DEBUG_PRINTLN(String("CommandInterface:set scene ") + scene); 
     unsigned short command = 0; 
     if (scene >=0 && scene < 20)
     {

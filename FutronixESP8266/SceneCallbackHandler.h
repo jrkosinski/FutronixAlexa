@@ -53,7 +53,8 @@ void SceneNumberCallbackHandler::handleCallback(int param)
 {
   if (param)
   {
-    this->_command->setScene(this->_sceneNo); 
+    SCENE_TO_SET = this->_sceneNo;
+    //this->_command->setScene(this->_sceneNo); 
   }
 }
 

@@ -64,7 +64,7 @@ typedef std::function<void(unsigned char, const char *, bool)> TStateFunction;
 
 typedef struct {
     char * name;
-    char * uuid;
+    char * uuid;    
     bool hit;
     AsyncServer * server;
 } fauxmoesp_device_t;
@@ -90,6 +90,7 @@ class Fauxmo
     void onMessage(TStateFunction fn) { _callback = fn; }
     void enable(bool enable) { _enabled = enable; }
     void handle();
+    std::vector<fauxmoesp_device_t>* getDevices() { return &this->_devices;}
 
   private:
     void sendUDPResponse(unsigned int deviceId);

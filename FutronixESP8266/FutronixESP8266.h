@@ -37,6 +37,8 @@ class FutronixESP8266
 
     /* last set scene */
     int _currentScene = -1; 
+    
+    char* _scenes[20] = {"scene one", "scene two", "scene three", "scene four", "scene five", "scene six", "scene seven", "scene eight", "scene nine", "scene ten", "scene eleven", "scene twelve", "scene thirteen", "scene fourteen", "scene fifteen", "scene sixteen", "scene seventeen", "scene eighteen", "scene nineteen", "scene twenty" };
 
   public: 
     FutronixESP8266();
@@ -202,10 +204,15 @@ void FutronixESP8266::startWemoServers()
   int baseNumberPort = 80; 
   int baseNamePort = baseNumberPort + this->_db->getSceneCount(); 
 
+  for(int n=0; n<this->_db->getSceneCount(); n++)
+  {
+    this->_wemo->addDevice(this->_scenes[n], 0, new SceneNumberCallbackHandler(this->_command, n)); 
+  }
+  
   //read all records from EEPROM
-  this->_wemo->addDevice("scene one", 80, new SceneNumberCallbackHandler(this->_command, 0)); 
-  this->_wemo->addDevice("scene two", 81, new SceneNumberCallbackHandler(this->_command, 1)); 
-  this->_wemo->addDevice("scene three", 82, new SceneNumberCallbackHandler(this->_command, 2)); 
+  //this->_wemo->addDevice("scene one", 80, new SceneNumberCallbackHandler(this->_command, 0)); 
+  //this->_wemo->addDevice("scene two", 81, new SceneNumberCallbackHandler(this->_command, 1)); 
+
 /*
   //add wemo server/listeners for every scene & scene name 
   for(int n=0; n<this->_db->getRecordCount(); n++)
@@ -219,6 +226,7 @@ void FutronixESP8266::startWemoServers()
   }
   */
 }
+
 
 
 #endif

@@ -17,6 +17,8 @@
 
 #include <Arduino.h>
 
+int SCENE_TO_SET = -1; 
+
 #include "debug.h"
 #include "FutronixESP8266.h"
 #include "AdminServer.h"
@@ -50,6 +52,13 @@ void loop()
   futronix.loop();
   //adminServer.listen();
 
+  if (SCENE_TO_SET >= 0)
+  {
+    int scene = SCENE_TO_SET;
+    SCENE_TO_SET = -1; 
+    futronix.setScene(scene); 
+  }
+
 /*
   LEDOutput led; 
   led.begin(); 
@@ -62,6 +71,9 @@ void loop()
 /*---------------------------------------*/
 void runOnce()
 {
+  delay(10000); 
+  CommandInterface::setSceneStatic(2);
+  delay(10000); 
 }
 
 
