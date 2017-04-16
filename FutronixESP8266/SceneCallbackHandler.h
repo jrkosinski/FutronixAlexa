@@ -70,11 +70,9 @@ void SceneNameCallbackHandler::handleCallback(int param)
 {
   if (param)
   {    
-    int sceneNo = -1; 
-    DatabaseRecord* record = this->_db->getRecordByName(this->_sceneName); 
-    if (record != 0)
+    int sceneNo = this->_db->getSceneNumber(this->_sceneName); 
+    if (sceneNo >= 0)
     {
-      sceneNo = record->getSceneNumber(); 
       this->_command->setScene(sceneNo); 
     }
   }

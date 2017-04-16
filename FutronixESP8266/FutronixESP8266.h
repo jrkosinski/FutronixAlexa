@@ -58,7 +58,7 @@ class FutronixESP8266
     /***
      * gets entire contens of scene-names DB
      */
-    DatabaseRecord* getAllSceneNames(); 
+    char** getAllSceneNames(); 
 
     /***
      * clears EEPROM DB of scene names 
@@ -151,10 +151,11 @@ void FutronixESP8266::setup(const char* wifiSsid, const char* wifiPasswd, bool c
 }
 
 /*---------------------------------------*/
-DatabaseRecord* FutronixESP8266::getAllSceneNames()
+char** FutronixESP8266::getAllSceneNames()
 {
   DEBUG_PRINTLN("Futronix:getAllSceneNames"); 
-  return this->_db->getAllRecords();
+  //return this->_db->getAllRecords();
+  return NULL;
 }
 
 /*---------------------------------------*/
@@ -168,7 +169,7 @@ void FutronixESP8266::clearSceneNames()
 void FutronixESP8266::renameScene(int sceneNo, const char* sceneName)
 {
   DEBUG_PRINTLN(String("Futronix:renameScene ") + String(sceneNo) + " to " + sceneName); 
-  this->_db->setRecord(sceneNo, sceneName);
+  this->_db->setSceneName(sceneNo, sceneName);
 
   //TODO: restart web server 
 } 
@@ -199,11 +200,9 @@ void FutronixESP8266::startWemoServers()
   DEBUG_PRINTLN("Futronix:startWemoServers"); 
   
   int baseNumberPort = 80; 
-  int baseNamePort = baseNumberPort + this->_db->getRecordCount(); 
+  int baseNamePort = baseNumberPort + this->_db->getSceneCount(); 
 
   //read all records from EEPROM
-  DatabaseRecord* records = this->_db->getAllRecords(); 
-
   this->_wemo->addDevice("scene one", 80, new SceneNumberCallbackHandler(this->_command, 0)); 
   this->_wemo->addDevice("scene two", 81, new SceneNumberCallbackHandler(this->_command, 1)); 
   this->_wemo->addDevice("scene three", 82, new SceneNumberCallbackHandler(this->_command, 2)); 

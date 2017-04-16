@@ -35,6 +35,8 @@ class DatabaseEntry
       this->setData(data); 
     }
     
+    char* getData() { return this->_data; }
+    
     void setData(const char* data)
     {
       if (this->fixedSize > 0)
@@ -50,8 +52,6 @@ class DatabaseEntry
         this->_data[len]= 0;
       }
     }
-    
-    char* getData() { return this->_data; }
 };
 /****************************************/
 
@@ -60,7 +60,7 @@ class DatabaseEntry
  * Database
  * --------
  */
-class EEPromDatabase 
+class EEPROMDatabase 
 {
   private: 
     EEPROMInterface _eeprom;
@@ -69,8 +69,8 @@ class EEPromDatabase
     int _totalSize = 0; 
   
   public: 
-    EEPromDatabase(); 
-    ~EEPromDatabase(); 
+    EEPROMDatabase(); 
+    ~EEPROMDatabase(); 
     
     unsigned int getRecordCount() { return this->_recordCount; }
     void configure(const DatabaseEntry* entries, int count);
@@ -117,24 +117,24 @@ class EEPromDatabase
 
 
 /*---------------------------------------*/
-EEPromDatabase::EEPromDatabase()
+EEPROMDatabase::EEPROMDatabase()
 {
 }
 
 /*---------------------------------------*/
-EEPromDatabase::~EEPromDatabase()
+EEPROMDatabase::~EEPROMDatabase()
 {
   delete this->_entries;
 }
 
 /*---------------------------------------*/
-void EEPromDatabase::begin()
+void EEPROMDatabase::begin()
 {
   this->_eeprom.begin();
 }
 
 /*---------------------------------------*/
-void EEPromDatabase::configure(const DatabaseEntry* entries, int count)
+void EEPROMDatabase::configure(const DatabaseEntry* entries, int count)
 {
   this->_entries = (DatabaseEntry*)malloc(count * sizeof(DatabaseEntry)); 
   this->_recordCount = count; 
@@ -156,13 +156,13 @@ void EEPromDatabase::configure(const DatabaseEntry* entries, int count)
 }
 
 /*---------------------------------------*/
-DatabaseEntry* EEPromDatabase::getEntry(unsigned int recordIndex)
+DatabaseEntry* EEPROMDatabase::getEntry(unsigned int recordIndex)
 {
   return this->getEntry(recordIndex, false);
 }
 
 /*---------------------------------------*/
-DatabaseEntry* EEPromDatabase::getEntry(unsigned int recordIndex, bool forceRefresh)
+DatabaseEntry* EEPROMDatabase::getEntry(unsigned int recordIndex, bool forceRefresh)
 {
   if (recordIndex > this->_recordCount)
     return NULL; 
@@ -182,13 +182,13 @@ DatabaseEntry* EEPromDatabase::getEntry(unsigned int recordIndex, bool forceRefr
 }
 
 /*---------------------------------------*/
-void EEPromDatabase::setEntry(unsigned int recordIndex, const char* data)
+void EEPROMDatabase::setEntry(unsigned int recordIndex, const char* data)
 {
   this->setEntry(recordIndex, data, false); 
 }
 
 /*---------------------------------------*/
-void EEPromDatabase::setEntry(unsigned int recordIndex, const char* data, bool save)
+void EEPROMDatabase::setEntry(unsigned int recordIndex, const char* data, bool save)
 {
   if (recordIndex > this->_recordCount)
     return; 
@@ -204,7 +204,7 @@ void EEPromDatabase::setEntry(unsigned int recordIndex, const char* data, bool s
 }
 
 /*---------------------------------------*/
-DatabaseEntry* EEPromDatabase::readAllEntries()
+DatabaseEntry* EEPROMDatabase::readAllEntries()
 {
   char buffer[this->_totalSize + 1]; 
   buffer[this->_totalSize] = 0; 
@@ -224,13 +224,13 @@ DatabaseEntry* EEPromDatabase::readAllEntries()
 }
 
 /*---------------------------------------*/
-DatabaseEntry* EEPromDatabase::getAllEntries()
+DatabaseEntry* EEPROMDatabase::getAllEntries()
 {
   return this->_entries;
 }
 
 /*---------------------------------------*/
-void EEPromDatabase::clear(bool clearProgramMemory)
+void EEPROMDatabase::clear(bool clearProgramMemory)
 {
   this->_eeprom.clear();
 
@@ -244,7 +244,7 @@ void EEPromDatabase::clear(bool clearProgramMemory)
 }
 
 /*---------------------------------------*/
-void EEPromDatabase::save()
+void EEPROMDatabase::save()
 {
   int len = this->_totalSize;
   char buffer[len]; 
@@ -260,7 +260,7 @@ void EEPromDatabase::save()
 }
 
 /*---------------------------------------*/
-void EEPromDatabase::debugDump()
+void EEPROMDatabase::debugDump()
 {
   for(int n=0; n<this->_recordCount; n++)
     DEBUG_PRINTLN(String(this->_entries[n].index) + ":" + this->_entries[n].getData()); 

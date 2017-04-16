@@ -13,8 +13,8 @@
 
 #define SERVER_COUNT_LIMIT 40
 
-//#define __OLD_VERSION__
-#ifndef __OLD_VERSION__
+//#define __OLD_WEMO_VERSION__
+#ifndef __OLD_WEMO_VERSION__
 
 /****************************************
  * WemoEmulator
