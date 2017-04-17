@@ -13,6 +13,14 @@
  *    
  * - code safety/handling 
  * - code prettify 
+ * 
+ C:\Users\Home\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.1.0\tools\sdk\lib\libaxtls.a
+ C:\Users\Home\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.1.0\libraries\ESP8266WiFi\src\include\DataSource.h
+ C:\Users\Home\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.1.0\libraries\ESP8266WiFi\src\include\ssl.h
+ C:\Users\Home\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.1.0\libraries\ESP8266WiFi\src\include\ClientContext.h
+ C:\Users\Home\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.1.0\libraries\ESP8266WiFi\src\include\WiFiClientSecure.h / .cpp
+ C:\Users\Home\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.1.0\libraries\ESP8266WiFi\src\include\WiFiClient.cpp 
+ 
  */
 
 #include <Arduino.h>
