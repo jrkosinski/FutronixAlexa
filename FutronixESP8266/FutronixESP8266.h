@@ -35,6 +35,9 @@ class FutronixESP8266
     /* on-chip database */
     Database* _db; 
 
+    /* for AWS MQTT */ 
+    AwsManager* _aws; 
+
     /* last set scene */
     int _currentScene = -1; 
     
@@ -103,6 +106,7 @@ FutronixESP8266::FutronixESP8266()
   this->_command = new CommandInterface(); 
   this->_wifi = new WifiConnection(this->_db->getWifiSsid(), this->_db->getWifiPasswd()); 
   this->_wemo = new WemoEmulator(); 
+  this->_aws = new AwsManager(); 
 }
 
 /*---------------------------------------*/
@@ -126,8 +130,10 @@ void FutronixESP8266::begin()
 
   if (this->_wifi->connect())
   {
-    this->_wemo->begin();
-    this->startWemoServers();
+    //this->_wemo->begin();
+    //this->startWemoServers();
+    this->_aws->begin();
+    this->_aws->connectAndListen();
   }
 }
 
@@ -232,6 +238,7 @@ void FutronixESP8266::startWemoServers()
 /*---------------------------------------*/
 void FutronixESP8266::queueSetScene(int scene)
 {
+  SCENE_TO_SET = scene; 
 }
 
 
