@@ -1,18 +1,12 @@
 package futronix.alexaadmin.activities;
 
-import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.ProgressBar;
 
 import futronix.alexaadmin.api.ApiStatus;
 import futronix.alexaadmin.Global;
 import futronix.alexaadmin.R;
-import futronix.alexaadmin.callbacks.GetStatusCallback;
+import futronix.alexaadmin.callbacks.ApiStatusCallback;
 
 public class MainActivity extends FutronixActivity
 {
@@ -37,7 +31,7 @@ public class MainActivity extends FutronixActivity
         super.onResume();
         this.showSpinner();
 
-        Global.ApiInterface.getStatusAsync(new GetStatusCallback() {
+        Global.apiInterface.getStatusAsync(new ApiStatusCallback() {
             @Override
             public void execute(ApiStatus status) {
                 dismissSpinner();

@@ -8,7 +8,7 @@ import android.widget.EditText;
 import futronix.alexaadmin.Global;
 import futronix.alexaadmin.R;
 import futronix.alexaadmin.api.ApiStatus;
-import futronix.alexaadmin.callbacks.GetStatusCallback;
+import futronix.alexaadmin.callbacks.ApiStatusCallback;
 
 public class SetupActivity extends FutronixActivity
 {
@@ -30,10 +30,10 @@ public class SetupActivity extends FutronixActivity
         this.setupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                Global.ApiInterface.setupAsync(
+                Global.apiInterface.setupAsync(
                         wifiSsidText.getText().toString(),
                         wifiPasswdText.getText().toString(),
-                        new GetStatusCallback() {
+                        new ApiStatusCallback() {
                             @Override
                             public void execute(ApiStatus status) {
                                 switch (status) {

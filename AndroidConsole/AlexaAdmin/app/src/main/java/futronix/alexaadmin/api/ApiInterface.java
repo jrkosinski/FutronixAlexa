@@ -1,8 +1,11 @@
 package futronix.alexaadmin.api;
 
 import java.io.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 
-import futronix.alexaadmin.callbacks.GetStatusCallback;
+import futronix.alexaadmin.callbacks.ApiStatusCallback;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -42,7 +45,7 @@ public class ApiInterface implements  IApiInterface
         return ApiStatus.NotFound;
     }
 
-    public void getStatusAsync(final GetStatusCallback callback)
+    public void getStatusAsync(final ApiStatusCallback callback)
     {
         try {
             OkHttpClient client = new OkHttpClient();
@@ -91,7 +94,7 @@ public class ApiInterface implements  IApiInterface
         }
     }
 
-    public void setupAsync(String wifiSsid, String wifiPasswd, final GetStatusCallback callback)
+    public void setupAsync(String wifiSsid, String wifiPasswd, final ApiStatusCallback callback)
     {
         try {
             OkHttpClient client = new OkHttpClient();
@@ -137,6 +140,24 @@ public class ApiInterface implements  IApiInterface
         catch (Exception e)
         {
             //TODO: log error
+        }
+    }
+
+    public void findDeviceAsync(ApiStatusCallback callback)
+    {
+        try {
+            String messageStr = "Hello Android!";
+            int server_port = 1001;
+            DatagramSocket s = new DatagramSocket();
+            InetAddress local = InetAddress.getByName("192.168.1.102");
+            int msg_length = messageStr.length();
+            byte[] message = messageStr.getBytes();
+            DatagramPacket p = new DatagramPacket(message, msg_length, local, server_port);
+            s.send(p);
+        }
+        catch (Exception e)
+        {
+            //TODO: log
         }
     }
 }
