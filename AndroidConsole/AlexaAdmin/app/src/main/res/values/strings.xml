@@ -2,4 +2,7 @@
     <string name="app_name">AlexaAdmin</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_setup">SetupActivity</string>
+    <string name="title_activity_scenes">ScenesActivity</string>
+    <string name="title_activity_find_devices">FindDevicesActivity</string>
+    <string name="title_activity_scan">ScanActivity</string>
 </resources>

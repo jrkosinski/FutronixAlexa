@@ -9,11 +9,47 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="futronix.alexaadmin.SetupActivity"
+    tools:context="futronix.alexaadmin.activities.SetupActivity"
     tools:showIn="@layout/activity_setup">
 
-    <TextView
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
+        android:inputType="text"
+        android:ems="10"
+        android:id="@+id/wifiSsidText"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="63dp"
+        android:text=""
+        android:padding="3dp"
+        android:maxLength="4"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:ems="10"
+        android:id="@+id/wifiPasswdText"
+        android:layout_below="@+id/wifiSsidText"
+        android:text=""
+        android:padding="3dp"
+        android:maxLength="4"/>
+
+    <Button
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:textAlignment="center"
+        android:text="update"
+        android:id="@+id/setupButton"
+        android:layout_below="@+id/wifiPasswdText"
+        android:textAllCaps="false"/>
+
+    <ProgressBar
+        android:indeterminate="true"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressSpinner"
+        android:visibility="gone">
+    </ProgressBar>
 </RelativeLayout>
