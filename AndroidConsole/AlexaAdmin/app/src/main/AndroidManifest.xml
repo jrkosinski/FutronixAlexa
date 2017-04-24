@@ -31,10 +31,6 @@
             android:name=".activities.FindDevicesActivity"
             android:label="@string/title_activity_find_devices" >
         </activity>
-        <activity
-            android:name=".activities.ScanActivity"
-            android:label="@string/title_activity_scan" >
-        </activity>
     </application>
 
 </manifest>
