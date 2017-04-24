@@ -6,7 +6,7 @@
 #include "FutronixESP8266.h"
 
 //TODO: run more than one instance on the wifi network
-#define ADMIN_SERVER_PORT 1001 
+#define ADMIN_SERVER_PORT 80 
 #define ADMIN_UDP_PORT    2001 
 
 /****************************************
@@ -129,18 +129,36 @@ void AdminServer::listen()
       }
     }
   }
+    
+  this->_server->handleClient();
 }
 
 /*---------------------------------------*/
 void AdminServer::handleGetSceneNames()
 {
-   
+  int sceneCount = this->_futronix->getSceneCount(); 
+  char* scenes[sceneCount]; 
+  this->_futronix->getAllSceneNames(scenes); 
+
+  char responseBuffer[100 * sceneCount]; 
+  char tempBuffer[100]; 
+  int bufferIndex = 0; 
+  for(int n=0; n<sceneCount; n++)
+  {
+    sprintf(tempBuffer, "%d:%s\n", (n+1), scenes[n]); 
+    strcpy(responseBuffer+bufferIndex, tempBuffer); 
+    bufferIndex+= strlen(tempBuffer); 
+  }
+
+  DEBUG_PRINTLN(String("AdminServer:handleGetSceneNames sending ") + responseBuffer); 
+  this->_server->send(200, "text/plain", responseBuffer);
 }
 
 /*---------------------------------------*/
 void AdminServer::handleClearSceneNames()
 {
-   
+  this->_futronix->clearSceneNames();
+  this->_server->send(200, "text/plain", "");
 }
 
 /*---------------------------------------*/
@@ -187,16 +205,18 @@ void AdminServer::handleSetup()
   String wifiPasswd = this->_server->arg("wifiPasswd");
   
   bool clearDatabase = false;
-  if (strcmp(clearDbArg.c_str(), "clearDb") == 0)
+  if (strcmp(clearDbArg.c_str(), "true") == 0)
     clearDatabase = true;
 
   //run setup
   this->_futronix->setup(wifiSsid.c_str(), wifiPasswd.c_str(), clearDatabase);
+  this->_server->send(200, "text/plain", "");
 }
  
 /*---------------------------------------*/
 void AdminServer::handleStatus()
 {
+  DEBUG_PRINTLN("AdminServer:got status request"); 
   if (this->_futronix->hasBeenSetUp())
     this->_server->send(200, "text/plain", "");
   else 

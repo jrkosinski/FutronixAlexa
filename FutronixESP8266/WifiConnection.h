@@ -76,7 +76,7 @@ bool WifiConnection::connect()
   if (state){
     DEBUG_PRINT(this->_wifiSsid);
     DEBUG_PRINT("  IP address: ");
-    DEBUG_PRINTLN(WiFi.localIP());
+    Serial.printf("%s\n", WiFi.localIP().toString().c_str());
   }
   else {
     DEBUG_PRINTLN("Connection failed.");

@@ -49,6 +49,8 @@ class FutronixESP8266
     void begin();
     void loop();
 
+    unsigned int getSceneCount();
+
     /***
      * returns a value indicating whether the DB on the chip 
      * has been initialized or not
@@ -63,7 +65,7 @@ class FutronixESP8266
     /***
      * gets entire contens of scene-names DB
      */
-    char** getAllSceneNames(); 
+    void getAllSceneNames(char** buffer); 
 
     /***
      * clears EEPROM DB of scene names 
@@ -132,8 +134,8 @@ void FutronixESP8266::begin()
   {
     //this->_wemo->begin();
     //this->startWemoServers();
-    this->_aws->begin();
-    this->_aws->connectAndListen();
+    //this->_aws->begin();
+    //this->_aws->connectAndListen();
   }
 }
 
@@ -141,6 +143,12 @@ void FutronixESP8266::begin()
 void FutronixESP8266::loop()
 {
   this->_wemo->listen();
+}
+
+/*---------------------------------------*/
+unsigned int FutronixESP8266::getSceneCount()
+{
+  return this->_db->getSceneCount();
 }
 
 /*---------------------------------------*/
@@ -161,11 +169,14 @@ void FutronixESP8266::setup(const char* wifiSsid, const char* wifiPasswd, bool c
 }
 
 /*---------------------------------------*/
-char** FutronixESP8266::getAllSceneNames()
+void FutronixESP8266::getAllSceneNames(char** buffer)
 {
   DEBUG_PRINTLN("Futronix:getAllSceneNames"); 
-  //return this->_db->getAllRecords();
-  return NULL;
+  int count = this->_db->getSceneCount();
+  for(int n=0; n<count; n++)
+  {
+    buffer[n] = this->_db->getSceneName(n); 
+  }
 }
 
 /*---------------------------------------*/
@@ -179,7 +190,8 @@ void FutronixESP8266::clearSceneNames()
 void FutronixESP8266::renameScene(int sceneNo, const char* sceneName)
 {
   DEBUG_PRINTLN(String("Futronix:renameScene ") + String(sceneNo) + " to " + sceneName); 
-  this->_db->setSceneName(sceneNo, sceneName);
+  this->_db->setSceneName(sceneNo-1, sceneName);
+  this->_db->save();
 
   //TODO: restart web server 
 } 
@@ -216,23 +228,6 @@ void FutronixESP8266::startWemoServers()
   {
     this->_wemo->addDevice(this->_scenes[n], 0, new SceneCallbackHandler(n)); 
   }
-  
-  //read all records from EEPROM
-  //this->_wemo->addDevice("scene one", 80, new SceneCallbackHandler(this->_command, 0)); 
-  //this->_wemo->addDevice("scene two", 81, new SceneCallbackHandler(this->_command, 1)); 
-
-/*
-  //add wemo server/listeners for every scene & scene name 
-  for(int n=0; n<this->_db->getRecordCount(); n++)
-  {
-    //scene numbers 
-    this->_wemo->addDevice(String("scene ") + numbers[n], baseNumberPort+n, new SceneNumberCallbackHandler(this->_command, n));
-
-    //scene names 
-    if (strlen(records[n].getData()) > 0)
-      this->_wemo->addDevice(records[n].getData(), baseNamePort+n, new SceneNameCallbackHandler(this->_command, this->_db, records[n].getData())); 
-  }
-  */
 }
 
 /*---------------------------------------*/

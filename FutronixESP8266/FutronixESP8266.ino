@@ -43,7 +43,7 @@ void setup()
   Serial.begin(9600);
 
   futronix.begin();
-  //adminServer.begin();
+  adminServer.begin();
 }
 
 IRTransmitter ir; 
@@ -58,7 +58,7 @@ void loop()
   }
   
   futronix.loop();
-  //adminServer.listen();
+  adminServer.listen();
 
   if (SCENE_TO_SET >= 0)
   {

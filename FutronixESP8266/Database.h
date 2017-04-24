@@ -9,7 +9,7 @@
 
 #define WIFI_SSID_INDEX     (MAX_SCENES+0)
 #define WIFI_PASSWD_INDEX   (MAX_SCENES+1)
-#define MAGIC_NUMBER_INDEX  (MAX_SCENES+2)
+#define MAGIC_WORD_INDEX  (MAX_SCENES+2)
 #define RECORD_COUNT        (MAX_SCENES+3)
 
 #define MAGIC_WORD "Futronix:012345678998765432102017:Futronix" 
@@ -118,9 +118,17 @@ bool Database::hasBeenSetUp()
 {
   if (!this->_enabled)
     return false;
-    
-  DatabaseEntry* entry = this->_eeprom.getEntry(MAGIC_NUMBER_INDEX, true); 
-  return (strcmp(MAGIC_WORD, entry->getData()) == 0);
+
+  DEBUG_PRINTLN("Database:hasBeenSetUp"); 
+  bool isSetUp = false;
+  DatabaseEntry* entry = this->_eeprom.getEntry(MAGIC_WORD_INDEX, true); 
+  if (entry != NULL)
+  {
+    DEBUG_PRINTLN(String("Database: MagicNumber=") + entry->getData()); 
+    isSetUp = (strcmp(MAGIC_WORD, entry->getData()) == 0);
+  }
+
+  return isSetUp;
 }
 
 /*---------------------------------------*/
@@ -159,6 +167,17 @@ char* Database::getSceneName(unsigned int sceneNumber)
       return record->getData();    
 
     return NULL;
+  }
+}
+
+/*---------------------------------------*/
+void Database::setSceneName(unsigned int sceneNumber, const char* name)
+{
+  if (this->_enabled)
+  {
+    DatabaseEntry* record = this->_eeprom.getEntry(sceneNumber); 
+    if (record != NULL)
+      record->setData(name);
   }
 }
 
@@ -218,6 +237,11 @@ void Database::save()
     return;
     
   DEBUG_PRINTLN("Database:save"); 
+  DatabaseEntry* entry = this->_eeprom.getEntry(MAGIC_WORD_INDEX, true); 
+  if (entry != NULL)
+  {
+    entry->setData(MAGIC_WORD); 
+  }
 
   this->_eeprom.save();
 }
