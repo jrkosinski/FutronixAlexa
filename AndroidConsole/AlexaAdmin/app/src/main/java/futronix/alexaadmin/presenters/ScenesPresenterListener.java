@@ -9,4 +9,5 @@ public class ScenesPresenterListener extends PresenterListenerBase
 {
     public void onSetSceneSuccess(int scene){}
     public void onSetSceneFailure(int scene){}
+    public void showScene(int scene){}
 }

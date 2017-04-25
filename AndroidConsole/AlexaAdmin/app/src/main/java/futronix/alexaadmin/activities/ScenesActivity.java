@@ -79,6 +79,11 @@ public class ScenesActivity extends FutronixActivity
         }
 
         @Override
+        public void showScene(int scene) {
+            //TODO: show scene in spinner
+        }
+
+        @Override
         public void showProgress(boolean show)
         {
             if (show == true)

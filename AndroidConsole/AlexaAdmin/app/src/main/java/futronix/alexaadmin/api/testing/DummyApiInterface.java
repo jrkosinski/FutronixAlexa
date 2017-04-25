@@ -3,6 +3,7 @@ package futronix.alexaadmin.api.testing;
 import futronix.alexaadmin.Global;
 import futronix.alexaadmin.api.*;
 import futronix.alexaadmin.callbacks.ApiStatusCallback;
+import futronix.alexaadmin.callbacks.GetSceneCallback;
 
 /**
  * Created by UserZ150 on 23/4/2560.
@@ -25,6 +26,11 @@ public class DummyApiInterface implements IApiInterface
     }
 
     public void setSceneAsync(int scene, final ApiStatusCallback callback)
+    {
+        new TestThread(callback, ApiStatus.Running).start();
+    }
+
+    public void getSceneAsync(final GetSceneCallback callback)
     {
         new TestThread(callback, ApiStatus.Running).start();
     }

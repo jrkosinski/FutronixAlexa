@@ -9,6 +9,7 @@ import java.net.InetAddress;
 
 import futronix.alexaadmin.Global;
 import futronix.alexaadmin.callbacks.ApiStatusCallback;
+import futronix.alexaadmin.callbacks.GetSceneCallback;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -158,16 +159,6 @@ public class ApiInterface implements  IApiInterface
         }
     }
 
-    private String buildUrl(String suffix)
-    {
-        String output = "";
-        if (Global.device.ipAddress != null) {
-            output = "http://" + Global.device.ipAddress.toString() + ":" + Global.device.tcpPort + "/admin/" + suffix;
-        }
-
-        return output;
-    }
-
     public void setSceneAsync(int scene, final ApiStatusCallback callback)
     {
         try {
@@ -215,5 +206,65 @@ public class ApiInterface implements  IApiInterface
         {
             //TODO: log error
         }
+    }
+
+    public void getSceneAsync(final GetSceneCallback callback)
+    {
+        try {
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+                    .url(this.buildUrl("getScene"))
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    e.printStackTrace();
+                    if (callback != null)
+                        callback.execute(ApiStatus.NotFound);
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException
+                {
+                    if (!response.isSuccessful())
+                    {
+                        Global.device.status = ApiStatus.NotFound;
+                    }
+                    else {
+                        switch (response.code()) {
+                            case 200:
+                                Global.device.status = ApiStatus.Running;
+                                //TODO: get content from response
+                                break;
+                            case 404:
+                                Global.device.status = ApiStatus.NotSetUp;
+                                break;
+                            default:
+                                Global.device.status = ApiStatus.NotFound;
+                                break;
+                        }
+                    }
+
+                    if (callback != null)
+                        callback.execute(Global.device.status, 1);
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            //TODO: log error
+        }
+    }
+
+    private String buildUrl(String suffix)
+    {
+        String output = "";
+        if (Global.device.ipAddress != null) {
+            output = "http://" + Global.device.ipAddress.toString() + ":" + Global.device.tcpPort + "/admin/" + suffix;
+        }
+
+        return output;
     }
 }
