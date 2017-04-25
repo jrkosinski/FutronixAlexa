@@ -15,7 +15,7 @@ public class UdpBroadcastTask extends AsyncTask<Context, Object, ApiStatus>
     protected ApiStatus doInBackground(Context... args)
     {
         UdpBroadcast udp = new UdpBroadcast(args[0]);
-        udp.sendBroadcast("hi!");
+        udp.sendBroadcast("Futronix:012345678998765432102017:Futronix" );
 
         return Global.device.status;
     }

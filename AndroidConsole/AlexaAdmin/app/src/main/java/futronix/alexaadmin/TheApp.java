@@ -15,7 +15,7 @@ public class TheApp extends Application {
         // getApplicationContext returns null here
 
         Log.i("main", "Constructor fired");
-        Global.initializeDevice("192.168.1.34", 80);
+        Global.initializeDevice(null, 80);
     }
 
     @Override

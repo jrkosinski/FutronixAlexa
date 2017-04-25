@@ -48,8 +48,10 @@ public class UdpBroadcast
                     if (socket != null)
                     {
                         Log.i("UDP socket timeout", "timeout");
-                        socket.close();
-                        socket.disconnect();
+                        if (socket != null) {
+                            socket.close();
+                            socket.disconnect();
+                        }
                         socket = null;
                         timer.cancel();
                     }
@@ -75,15 +77,21 @@ public class UdpBroadcast
 
                 //get IP and port from response
                 InetAddress serverAddress = packet.getAddress();
+                Log.i("Found device at", serverAddress.toString());
 
                 //set the response data globally
+                timer.cancel();
                 Global.device.found(serverAddress, 80);
 
-                socket.close();
-                socket.disconnect();
+                if (socket != null) {
+                    socket.close();
+                    socket.disconnect();
+                }
             } catch (IOException e) {
                 //TODO: log
+                Log.e("UDP Error", e.toString());
                 System.out.println(e.toString());
+                timer.cancel();
             }
         }
     }

@@ -27,7 +27,7 @@ public class ApiInterface implements  IApiInterface
             OkHttpClient client = new OkHttpClient();
 
             Request request = new Request.Builder()
-                    .url("http://192.168.l.34/admin/status")
+                    .url(this.buildUrl("status"))
                     .build();
 
             Response response = client.newCall(request).execute();
@@ -62,7 +62,7 @@ public class ApiInterface implements  IApiInterface
             OkHttpClient client = new OkHttpClient();
 
             Request request = new Request.Builder()
-                    .url("http://192.168.l.34/admin/status")
+                    .url(this.buildUrl("status"))
                     .build();
 
             client.newCall(request).enqueue(new Callback() {
@@ -109,62 +109,13 @@ public class ApiInterface implements  IApiInterface
         }
     }
 
-    public void setSceneAsync(int scene, final ApiStatusCallback callback)
-    {
-        try {
-            OkHttpClient client = new OkHttpClient();
-
-            Request request = new Request.Builder()
-                    .url("http://192.168.l.34/admin/setScene?scene=" + scene)
-                    .build();
-
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    e.printStackTrace();
-                    if (callback != null)
-                        callback.execute(ApiStatus.NotFound);
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException
-                {
-                    if (!response.isSuccessful())
-                    {
-                        Global.device.status = ApiStatus.NotFound;
-                    }
-                    else {
-                        switch (response.code()) {
-                            case 200:
-                                Global.device.status = ApiStatus.Running;
-                                break;
-                            case 404:
-                                Global.device.status = ApiStatus.NotSetUp;
-                                break;
-                            default:
-                                Global.device.status = ApiStatus.NotFound;
-                                break;
-                        }
-                    }
-
-                    if (callback != null)
-                        callback.execute(Global.device.status);
-                }
-            });
-        }
-        catch (Exception e)
-        {
-            //TODO: log error
-        }
-    }
-
     public void setupAsync(String wifiSsid, String wifiPasswd, final ApiStatusCallback callback)
     {
         try {
             OkHttpClient client = new OkHttpClient();
 
             Request request = new Request.Builder()
-                    .url("http://192.168.l.34/admin/setup?wifiSsid=" + wifiSsid + "&wifiPasswd=" + wifiPasswd)
+                    .url(this.buildUrl("setup?wifiSsid=" + wifiSsid + "&wifiPasswd=" + wifiPasswd))
                     .build();
 
             client.newCall(request).enqueue(new Callback() {
@@ -207,21 +158,62 @@ public class ApiInterface implements  IApiInterface
         }
     }
 
-    public void findDeviceAsync(ApiStatusCallback callback)
+    private String buildUrl(String suffix)
+    {
+        String output = "";
+        if (Global.device.ipAddress != null) {
+            output = "http://" + Global.device.ipAddress.toString() + "/admin/" + suffix;
+        }
+
+        return output;
+    }
+
+    public void setSceneAsync(int scene, final ApiStatusCallback callback)
     {
         try {
-            String messageStr = "Hello Android!";
-            int server_port = 1001;
-            DatagramSocket s = new DatagramSocket();
-            InetAddress local = InetAddress.getByName("192.168.1.102");
-            int msg_length = messageStr.length();
-            byte[] message = messageStr.getBytes();
-            DatagramPacket p = new DatagramPacket(message, msg_length, local, server_port);
-            s.send(p);
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+                    .url(this.buildUrl("setScene?scene=" + scene))
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    e.printStackTrace();
+                    if (callback != null)
+                        callback.execute(ApiStatus.NotFound);
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException
+                {
+                    if (!response.isSuccessful())
+                    {
+                        Global.device.status = ApiStatus.NotFound;
+                    }
+                    else {
+                        switch (response.code()) {
+                            case 200:
+                                Global.device.status = ApiStatus.Running;
+                                break;
+                            case 404:
+                                Global.device.status = ApiStatus.NotSetUp;
+                                break;
+                            default:
+                                Global.device.status = ApiStatus.NotFound;
+                                break;
+                        }
+                    }
+
+                    if (callback != null)
+                        callback.execute(Global.device.status);
+                }
+            });
         }
         catch (Exception e)
         {
-            //TODO: log
+            //TODO: log error
         }
     }
 }

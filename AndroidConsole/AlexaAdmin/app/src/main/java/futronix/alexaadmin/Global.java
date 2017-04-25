@@ -12,7 +12,7 @@ import futronix.alexaadmin.model.Device;
  */
 public final class Global
 {
-    public final static IApiInterface apiInterface = new DummyApiInterface();
+    public final static IApiInterface apiInterface = new  ApiInterface();
     public final static Device device = new Device();
 
     public static void initializeDevice(String ip, int port)
