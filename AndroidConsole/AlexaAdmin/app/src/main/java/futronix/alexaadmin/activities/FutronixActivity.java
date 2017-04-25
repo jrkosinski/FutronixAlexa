@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import futronix.alexaadmin.R;
+import futronix.alexaadmin.presenters.Screen;
 
 public abstract class FutronixActivity extends AppCompatActivity
 {
@@ -84,6 +85,25 @@ public abstract class FutronixActivity extends AppCompatActivity
         Intent intent = new Intent(this, ScenesActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    protected void navigateTo(Screen screen)
+    {
+        switch (screen)
+        {
+            case Scenes:
+                this.directToScenes();
+                break;
+            case Discover:
+                this.directToDiscover();
+                break;
+            case Main   :
+                this.directToMain();
+                break;
+            case Setup:
+                this.directToSetup();
+                break;
+        }
     }
 
     protected void directToMain()
