@@ -7,6 +7,7 @@ import futronix.alexaadmin.api.ApiStatus;
 import futronix.alexaadmin.Global;
 import futronix.alexaadmin.R;
 import futronix.alexaadmin.callbacks.ApiStatusCallback;
+import futronix.alexaadmin.storage.LocalStorage;
 import futronix.alexaadmin.tasks.UdpBroadcastTask;
 
 public class MainActivity extends FutronixActivity
@@ -65,9 +66,9 @@ public class MainActivity extends FutronixActivity
         });
     }
 
+
     private final class FindDevicesTask extends UdpBroadcastTask
     {
-
         @Override
         protected void onPostExecute(ApiStatus result)
         {
@@ -77,6 +78,7 @@ public class MainActivity extends FutronixActivity
                     directToDiscover();
                     break;
                 default:
+                    LocalStorage.saveDevice(Global.device);
                     getApiStatus();
                     break;
             }

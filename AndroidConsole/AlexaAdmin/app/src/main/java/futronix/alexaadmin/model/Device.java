@@ -26,4 +26,14 @@ public class Device
         this.tcpPort = port;
         this.status = ApiStatus.Unknown;
     }
+
+    @Override
+    public String toString()
+    {
+        String ip = "";
+        if (this.ipAddress != null)
+            ip = this.ipAddress.toString();
+
+        return ip + ":" + tcpPort;
+    }
 }

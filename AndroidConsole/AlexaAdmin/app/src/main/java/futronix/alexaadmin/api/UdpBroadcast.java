@@ -81,7 +81,19 @@ public class UdpBroadcast
 
                 //set the response data globally
                 timer.cancel();
-                Global.device.found(serverAddress, 80);
+
+                //try to get the port number
+                int port = 80;
+                try {
+                    String content = new String(buffer, 0, packet.getLength());
+                    port = Integer.parseInt(content);
+                }
+                catch (Exception e)
+                {
+                    Log.e("Error parsing port", e.toString());
+                }
+
+                Global.device.found(serverAddress, port);
 
                 if (socket != null) {
                     socket.close();

@@ -162,7 +162,7 @@ public class ApiInterface implements  IApiInterface
     {
         String output = "";
         if (Global.device.ipAddress != null) {
-            output = "http://" + Global.device.ipAddress.toString() + "/admin/" + suffix;
+            output = "http://" + Global.device.ipAddress.toString() + ":" + Global.device.tcpPort + "/admin/" + suffix;
         }
 
         return output;

@@ -7,6 +7,8 @@ package futronix.alexaadmin;
 import android.app.Application;
 import android.util.Log;
 
+import futronix.alexaadmin.storage.LocalStorage;
+
 public class TheApp extends Application {
 
     public TheApp()
@@ -15,7 +17,7 @@ public class TheApp extends Application {
         // getApplicationContext returns null here
 
         Log.i("main", "Constructor fired");
-        Global.initializeDevice(null, 80);
+        LocalStorage.restoreDevice(Global.device);
     }
 
     @Override
