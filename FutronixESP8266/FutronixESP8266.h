@@ -132,8 +132,11 @@ void FutronixESP8266::begin()
 
   if (this->_wifi->connect())
   {
-    //this->_wemo->begin();
-    //this->startWemoServers();
+    //start wemo
+    this->_wemo->begin();
+    this->startWemoServers();
+
+    //start AWS service
     //this->_aws->begin();
     //this->_aws->connectAndListen();
   }

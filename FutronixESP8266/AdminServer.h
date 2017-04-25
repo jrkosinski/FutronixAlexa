@@ -4,6 +4,7 @@
 #include <WiFiUDP.h>
 #include <ESP8266WebServer.h>
 #include "FutronixESP8266.h"
+#include "CommandInterface.h"
 
 //TODO: run more than one instance on the wifi network
 #define ADMIN_SERVER_PORT 80 
@@ -119,13 +120,18 @@ void AdminServer::listen()
         this->_udp.write(MAGIC_WORD);
         this->_udp.endPacket();
         */
+          
         WiFiClient client; 
         DEBUG_PRINTLN(String("AdminServer: connecting to ") + this->_udp.remoteIP().toString().c_str());
-        if (client.connect("192.168.1.38", 2003))
-        {
-          DEBUG_PRINTLN(String("AdminServer: connected to ") + this->_udp.remoteIP().toString().c_str());
-          client.print("port 1001 mofo");
-        }
+        //if (client.connect(this->_udp.remoteIP(), this->_udp.remotePort()))
+        //{
+        //  DEBUG_PRINTLN(String("AdminServer: connected to ") + this->_udp.remoteIP().toString().c_str());
+        //  client.print("80");
+        //}
+
+        this->_udp.beginPacket(this->_udp.remoteIP(), this->_udp.remotePort()); 
+        this->_udp.write("80"); 
+        this->_udp.endPacket();
       }
     }
   }
@@ -177,7 +183,8 @@ void AdminServer::handleSetScene()
 {
   String scene = this->_server->arg("scene");   
 
-  this->_futronix->setScene(scene.toInt());
+  //this->_futronix->setScene(scene.toInt());
+  this->_futronix->queueSetScene(scene.toInt());
 
   this->_server->send(200, "text/plain", "");
 }

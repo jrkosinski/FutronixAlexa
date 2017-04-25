@@ -111,13 +111,13 @@ void IRTransmitter::sendFutronix(unsigned short command)
       if (command & mask) 
       {  
         // 1
-        DEBUG_PRINTLN("one");
+        //DEBUG_PRINTLN("one");
         commandBits[index++] = true; 
         onesCount++; 
       } 
       else
       {
-        DEBUG_PRINTLN("zero");
+        //DEBUG_PRINTLN("zero");
         commandBits[index++] = false; 
       }
     }
