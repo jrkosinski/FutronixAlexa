@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import futronix.alexaadmin.Global;
 import futronix.alexaadmin.R;
 
 public class FindDevicesActivity extends FutronixActivity
@@ -22,6 +23,7 @@ public class FindDevicesActivity extends FutronixActivity
         this.findButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
+                Global.device.clear();
                 directToMain();
             }
         });

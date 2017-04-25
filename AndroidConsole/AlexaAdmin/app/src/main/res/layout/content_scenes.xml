@@ -12,13 +12,22 @@
     tools:context="futronix.alexaadmin.activities.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <ProgressBar
-        android:indeterminate="true"
-        android:layout_centerInParent="true"
-        android:layout_width="wrap_content"
+    <Spinner
+        android:id="@+id/sceneSpinner"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/progressSpinner"
-        android:visibility="gone">
-    </ProgressBar>
+        android:entries="@array/scenes_array"
+        android:prompt="@string/set_scene_number" />
+
+    <Button
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:textAlignment="center"
+        android:text="update"
+        android:id="@+id/setSceneButton"
+        android:layout_below="@+id/sceneSpinner"
+        android:textAllCaps="false"/>
+
+    <include layout="@layout/progress_spinner" />
 
 </RelativeLayout>

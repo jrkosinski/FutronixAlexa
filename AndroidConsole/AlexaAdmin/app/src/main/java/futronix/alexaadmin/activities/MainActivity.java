@@ -7,6 +7,7 @@ import futronix.alexaadmin.api.ApiStatus;
 import futronix.alexaadmin.Global;
 import futronix.alexaadmin.R;
 import futronix.alexaadmin.callbacks.ApiStatusCallback;
+import futronix.alexaadmin.tasks.UdpBroadcastTask;
 
 public class MainActivity extends FutronixActivity
 {
@@ -31,6 +32,19 @@ public class MainActivity extends FutronixActivity
         super.onResume();
         this.showSpinner();
 
+        //if we have a saved IP, attempt to get status of that...
+        if (Global.device.ipAddress != null)
+        {
+            this.getApiStatus();
+        }
+        else
+        {
+            new FindDevicesTask().execute(this.getApplicationContext());
+        }
+    }
+
+    private final void getApiStatus()
+    {
         Global.apiInterface.getStatusAsync(new ApiStatusCallback() {
             @Override
             public void execute(ApiStatus status) {
@@ -49,5 +63,23 @@ public class MainActivity extends FutronixActivity
                 }
             }
         });
+    }
+
+    private final class FindDevicesTask extends UdpBroadcastTask
+    {
+
+        @Override
+        protected void onPostExecute(ApiStatus result)
+        {
+            switch(result)
+            {
+                case NotFound:
+                    directToDiscover();
+                    break;
+                default:
+                    getApiStatus();
+                    break;
+            }
+        }
     }
 }

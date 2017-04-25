@@ -12,12 +12,5 @@
     tools:context="futronix.alexaadmin.activities.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <ProgressBar
-        android:indeterminate="true"
-        android:layout_centerInParent="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/progressSpinner"
-        android:visibility="gone">
-    </ProgressBar>
+    <include layout="@layout/progress_spinner" />
 </RelativeLayout>

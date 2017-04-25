@@ -9,4 +9,5 @@ public interface IApiInterface {
     public ApiStatus getStatus();
     public void getStatusAsync(final ApiStatusCallback callback);
     public void setupAsync(String wifiSsid, String wifiPasswd, final ApiStatusCallback callback);
+    public void setSceneAsync(int scene, final ApiStatusCallback callback);
 }
