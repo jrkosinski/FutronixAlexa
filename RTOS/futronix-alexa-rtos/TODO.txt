@@ -1,0 +1,15 @@
+
+TODO: 
+- get rid of publishing (that random blinking?)
+- config debugger 
+- incorporate IR lib
+- parse JSON
+- convert code to be real project 
+- upload to source ctl
+
+
+TO TURN INTO APP: 
+- admin app to write wifi creds to chip 
+- EEPROM or SPIFFS to store wifi creds 
+- IR codesend 
+
